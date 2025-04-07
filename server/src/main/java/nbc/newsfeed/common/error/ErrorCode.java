@@ -19,8 +19,10 @@ public enum ErrorCode {
 	DUPLICATED_EMAIL("이미 등록된 이메일입니다.", HttpStatus.CONFLICT),
 	SAME_PASSWORD("이전 비밀번호와 동일한 비밀번호로 변경할 수 없습니다.", HttpStatus.BAD_REQUEST),
 
-	// ✅ 뉴스피드 관련 에러
-	SCHEDULE_NOT_FOUND("존재하지 않는 일정입니다", HttpStatus.NOT_FOUND),
+    // ✅ 뉴스피드 관련 에러
+    NEWSFEED_NOT_FOUND( "존재하지 않는 피드입니다", HttpStatus.NOT_FOUND),
+    NEWSFEED_FORBIDDEN( "해당 피드에 대한 권한이 없습니다", HttpStatus.NOT_FOUND),
+
 
 	// ✅ 댓글 관련 에러
 	COMMENT_NOT_FOUND("존재하지 않는 댓글입니다", HttpStatus.NOT_FOUND),

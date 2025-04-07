@@ -1,19 +1,14 @@
 package nbc.newsfeed.domain.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedUseYn;
+import static nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedUseYn.Y;
 import nbc.newsfeed.domain.repository.newsfeedLike.NewsFeedLikeRepository;
 
 import java.util.Optional;
@@ -38,7 +33,10 @@ public class NewsFeedEntity extends TimeBaseEntity{
 	private String content;
 
 	// 사용여부 ENUM?!
-	private Integer useYn;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	@Builder.Default
+	private NewsFeedUseYn useYn = Y;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
@@ -53,4 +51,8 @@ public class NewsFeedEntity extends TimeBaseEntity{
 		);
 	}
 
+
+	public void visibleNewsFeed(NewsFeedUseYn useYn) {
+		this.useYn = useYn;
+	}
 }
