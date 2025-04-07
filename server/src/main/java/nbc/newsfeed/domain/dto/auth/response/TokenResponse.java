@@ -1,4 +1,4 @@
-package nbc.newsfeed.domain.dto.user.auth;
+package nbc.newsfeed.domain.dto.auth.response;
 
 import java.util.Date;
 

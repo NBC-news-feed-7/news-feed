@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import nbc.newsfeed.domain.dto.user.auth.TokenResponse;
-import nbc.newsfeed.domain.dto.user.auth.request.SigninRequest;
-import nbc.newsfeed.domain.dto.user.auth.request.TokenRefreshRequest;
+import nbc.newsfeed.domain.dto.auth.request.SigninRequest;
+import nbc.newsfeed.domain.dto.auth.request.TokenRefreshRequest;
+import nbc.newsfeed.domain.dto.auth.response.TokenResponse;
 import nbc.newsfeed.domain.service.auth.AuthService;
 import nbc.newsfeed.domain.service.auth.model.Token;
 

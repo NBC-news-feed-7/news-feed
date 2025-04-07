@@ -1,4 +1,4 @@
-package nbc.newsfeed.domain.dto.user.auth.request;
+package nbc.newsfeed.domain.dto.auth.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
