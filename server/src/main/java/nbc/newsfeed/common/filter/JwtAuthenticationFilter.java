@@ -54,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 					.stream()
 					.map(SimpleGrantedAuthority::new)
 					.toList();
-
+				// TODO 인증에 유저 아이디 들어 있음 공유 필요
 				Authentication authentication = new TestingAuthenticationToken(
 					tokenClaim.getSubject(), "password", authorities
 				);
