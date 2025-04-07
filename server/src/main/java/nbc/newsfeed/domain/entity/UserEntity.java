@@ -1,5 +1,7 @@
 package nbc.newsfeed.domain.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,13 +28,22 @@ public class UserEntity extends TimeBaseEntity {
 	private Long id;
 
 	@Column(nullable = false, length = 10)
-	private String name;
+	private String nickname;
 
 	@Column(nullable = false, unique = true, length = 255)
 	private String email;
 
 	@Column(nullable = false, length = 255)
 	private String password;
-	// TODO Enum
-	private Integer useYn;
+
+	@Column(nullable = true)
+	private LocalDateTime deletedAt;
+
+	public static UserEntity withRegisterInfo(String email, String password, String nickname) {
+		return UserEntity.builder()
+			.email(email)
+			.password(password)
+			.nickname(nickname)
+			.build();
+	}
 }
