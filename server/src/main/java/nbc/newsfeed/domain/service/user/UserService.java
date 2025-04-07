@@ -61,4 +61,16 @@ public class UserService {
 		return userRepository.findById(userId)
 			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 	}
+
+	@Transactional
+	public void deleteById(final Long userId, final String password) {
+		UserEntity user = userRepository.findById(userId)
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+		if (!passwordEncoder.matches(password, user.getPassword())) {
+			throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
+		}
+
+		userRepository.deleteById(userId);
+	}
 }
