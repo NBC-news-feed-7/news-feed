@@ -36,11 +36,8 @@ public class FriendRequestService {
             throw new CustomException(ErrorCode.ALREADY_REQUESTED);
         }
 
-        UserEntity fromUser = userRepository.findById(fromUserId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        UserEntity toUser = userRepository.findById(toUserId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        UserEntity fromUser = getUserOrThrow(fromUserId);
+        UserEntity toUser = getUserOrThrow(toUserId);
 
         FriendRequestEntity request = FriendRequestEntity.builder()
                 .fromUser(fromUser)
@@ -48,8 +45,16 @@ public class FriendRequestService {
                 .status(FriendRequestStatus.REQUESTED)
                 .build();
 
-        friendRequestRepository.save(request);
+        FriendRequestEntity saved = friendRequestRepository.save(request);
 
-        return FriendRequestResponseDto.from(request);
+        return FriendRequestResponseDto.from(saved);
+    }
+
+    /**
+     * ✅ 유저 ID로 사용자 조회 (없으면 예외 발생)
+     */
+    private UserEntity getUserOrThrow(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 }
