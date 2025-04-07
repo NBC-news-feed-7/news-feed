@@ -29,8 +29,9 @@ public class JwtTokenService implements TokenService {
 	@Override
 	public Token generateToken(TokenClaim tokenClaim) {
 		final long now = System.currentTimeMillis();
-		Date expireDate = new Date(now + jwtConfig.getAccessToken().expire());
 		Date issuedDate = new Date(now);
+		Date accessTokenexpireDate = new Date(now + jwtConfig.getAccessToken().expire());
+		Date refreshTokenexpireDate = new Date(now + jwtConfig.getRefreshToken().expire());
 
 		SecretKey accessTokenSecretKey = Keys.hmacShaKeyFor(jwtConfig.getAccessToken().secret().getBytes());
 		SecretKey refreshTokenSecretKey = Keys.hmacShaKeyFor(jwtConfig.getRefreshToken().secret().getBytes());
@@ -41,7 +42,7 @@ public class JwtTokenService implements TokenService {
 			.claim("nickname", tokenClaim.getNickname())
 			.claim("roles", tokenClaim.getRoles())
 			.issuedAt(issuedDate)
-			.expiration(expireDate)
+			.expiration(accessTokenexpireDate)
 			.signWith(accessTokenSecretKey)
 			.compact();
 
@@ -51,11 +52,18 @@ public class JwtTokenService implements TokenService {
 			.claim("nickname", tokenClaim.getNickname())
 			.claim("roles", tokenClaim.getRoles())
 			.issuedAt(issuedDate)
-			.expiration(expireDate)
+			.expiration(refreshTokenexpireDate)
 			.signWith(refreshTokenSecretKey)
 			.compact();
 
-		return new Token(accessToken, refreshToken, issuedDate, expireDate);
+		return new Token(
+			accessToken,
+			issuedDate,
+			accessTokenexpireDate,
+			refreshToken,
+			issuedDate,
+			refreshTokenexpireDate
+		);
 	}
 
 	@Override

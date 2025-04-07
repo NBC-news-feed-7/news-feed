@@ -37,7 +37,7 @@ public class AuthService {
 
 		TokenClaim tokenClaim = new TokenClaim(user.getId(), user.getEmail(), user.getNickname(), List.of());
 		Token token = tokenService.generateToken(tokenClaim);
-		LocalDateTime expiredDateTime = token.getExpiredAt().toInstant()
+		LocalDateTime expiredDateTime = token.getRefreshTokenExpiredAt().toInstant()
 			.atZone(ZoneId.systemDefault())
 			.toLocalDateTime();
 
@@ -54,7 +54,7 @@ public class AuthService {
 
 		TokenClaim tokenClaim = tokenService.parseToken(refreshTokenEntity.getRefreshToken());
 		Token token = tokenService.generateToken(tokenClaim);
-		LocalDateTime expiredDateTime = token.getExpiredAt().toInstant()
+		LocalDateTime expiredDateTime = token.getRefreshTokenExpiredAt().toInstant()
 			.atZone(ZoneId.systemDefault())
 			.toLocalDateTime();
 

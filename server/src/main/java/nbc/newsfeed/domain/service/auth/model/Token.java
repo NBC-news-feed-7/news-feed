@@ -3,17 +3,17 @@ package nbc.newsfeed.domain.service.auth.model;
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
-/**
- * @author    : kimjungmin
- * Created on : 2025. 3. 23.
- */
+@Builder
 @Getter
 @AllArgsConstructor
 public class Token {
 	private String accessToken;
+	private Date accessTokenIssuedAt;
+	private Date accessTokenExpiredAt;
 	private String refreshToken;
-	private Date issuedAt;
-	private Date expiredAt;
+	private Date refreshTokenIssuedAt;
+	private Date refreshTokenExpiredAt;
 }
