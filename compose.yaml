@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  java-kata-mysql:
+  news_feed-mysql:
     image: mysql:8.0.35
 
     platform: linux/amd64
