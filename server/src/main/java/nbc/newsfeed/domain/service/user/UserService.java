@@ -31,4 +31,10 @@ public class UserService {
 
 		return userRepository.save(user);
 	}
+
+	@Transactional(readOnly = true)
+	public UserEntity findById(final Long userId) {
+		return userRepository.findById(userId)
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+	}
 }
