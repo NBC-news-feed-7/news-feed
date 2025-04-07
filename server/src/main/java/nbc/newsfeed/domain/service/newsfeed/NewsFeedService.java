@@ -34,7 +34,7 @@ public class NewsFeedService {
     public NewsFeedResponseDto createNewsFeed(Long userId, NewsFeedRequestDto requestDto){
         //userRepository에서 유저 찾아야댐
         UserEntity findUser = UserEntity.builder()
-                .name("test")
+                .nickname("test")
                 .email("test")
                 .password("test")
                 .id(userId).build();
@@ -51,7 +51,7 @@ public class NewsFeedService {
 
         //유저찾는거 해야댐
         UserEntity findUser = UserEntity.builder()
-                .name("test")
+                .nickname("test")
                 .email("test")
                 .password("test")
                 .id(userId).build();

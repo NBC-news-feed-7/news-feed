@@ -22,7 +22,7 @@ public class NewsFeedLikeService {
 
     public void toggleLike(Long newsId, Long userId) {
         NewsFeedEntity newsFeed = newsFeedRepository.findById(newsId)
-                .orElseThrow(() -> new CustomException(ErrorCode.SCHEDULE_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -32,7 +32,7 @@ public class NewsFeedLikeService {
     @Transactional(readOnly = true)
     public int getLikeCount(Long newsId) {
         Optional<NewsFeedEntity> newsFeed  = Optional.ofNullable(newsFeedRepository.findById(newsId)
-                .orElseThrow(() -> new CustomException(ErrorCode.SCHEDULE_NOT_FOUND)));
+                .orElseThrow(() -> new CustomException(ErrorCode.NEWSFEED_NOT_FOUND)));
 
         return likeRepository.countByNewsFeed(newsFeed);
     }
