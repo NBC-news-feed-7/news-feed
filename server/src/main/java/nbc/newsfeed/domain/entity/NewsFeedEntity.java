@@ -38,4 +38,8 @@ public class NewsFeedEntity extends TimeBaseEntity{
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity user;
+
+	public void deleteNewsFeed(NewsFeedUseYn useYn) {
+		this.useYn = useYn;
+	}
 }
