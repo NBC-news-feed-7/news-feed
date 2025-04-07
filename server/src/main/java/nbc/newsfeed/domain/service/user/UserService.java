@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import nbc.newsfeed.common.error.CustomException;
 import nbc.newsfeed.common.error.ErrorCode;
 import nbc.newsfeed.domain.entity.UserEntity;
-import nbc.newsfeed.domain.repository.UserRepository;
+import nbc.newsfeed.domain.repository.user.UserRepository;
 
 /**
  * @author    : kimjungmin

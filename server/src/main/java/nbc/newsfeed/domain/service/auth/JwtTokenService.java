@@ -27,38 +27,35 @@ public class JwtTokenService implements TokenService {
 	private final JwtConfig jwtConfig;
 
 	@Override
-	public String generateAccessToken(TokenClaim tokenClaim) {
+	public Token generateToken(TokenClaim tokenClaim) {
 		final long now = System.currentTimeMillis();
 		Date expireDate = new Date(now + jwtConfig.getAccessToken().expire());
-		SecretKey secretKey = Keys.hmacShaKeyFor(jwtConfig.getAccessToken().secret().getBytes());
+		Date issuedDate = new Date(now);
 
-		return Jwts.builder()
-			.subject(tokenClaim.getSubject())
+		SecretKey accessTokenSecretKey = Keys.hmacShaKeyFor(jwtConfig.getAccessToken().secret().getBytes());
+		SecretKey refreshTokenSecretKey = Keys.hmacShaKeyFor(jwtConfig.getRefreshToken().secret().getBytes());
+
+		final String accessToken = Jwts.builder()
+			.subject(tokenClaim.getSubject().toString())
+			.claim("email", tokenClaim.getEmail())
+			.claim("nickname", tokenClaim.getNickname())
 			.claim("roles", tokenClaim.getRoles())
-			.issuedAt(new Date(now))
+			.issuedAt(issuedDate)
 			.expiration(expireDate)
-			.signWith(secretKey)
+			.signWith(accessTokenSecretKey)
 			.compact();
-	}
 
-	@Override
-	public String generateRefreshToken(TokenClaim tokenClaim) {
-		final long now = System.currentTimeMillis();
-		Date expireDate = new Date(now + jwtConfig.getRefreshToken().expire());
-		SecretKey secretKey = Keys.hmacShaKeyFor(jwtConfig.getRefreshToken().secret().getBytes());
-
-		return Jwts.builder()
-			.subject(tokenClaim.getSubject())
+		final String refreshToken = Jwts.builder()
+			.subject(tokenClaim.getSubject().toString())
+			.claim("email", tokenClaim.getEmail())
+			.claim("nickname", tokenClaim.getNickname())
 			.claim("roles", tokenClaim.getRoles())
-			.issuedAt(new Date(now))
+			.issuedAt(issuedDate)
 			.expiration(expireDate)
-			.signWith(secretKey)
+			.signWith(refreshTokenSecretKey)
 			.compact();
-	}
 
-	@Override
-	public Token generateToken(TokenClaim tokenClaim) {
-		return new Token(generateAccessToken(tokenClaim), generateRefreshToken(tokenClaim));
+		return new Token(accessToken, refreshToken, issuedDate, expireDate);
 	}
 
 	@Override
@@ -67,9 +64,11 @@ public class JwtTokenService implements TokenService {
 		Jws<Claims> claimsJws = Jwts.parser().verifyWith(secretKey).build()
 			.parseSignedClaims(token);
 
-		final String email = claimsJws.getPayload().getSubject();
+		final Long userId = Long.valueOf(claimsJws.getBody().getSubject());
+		final String email = claimsJws.getBody().get("email", String.class);
+		final String nickname = claimsJws.getBody().get("nickname", String.class);
 		List<?> roles = claimsJws.getPayload().get("roles", List.class);
 
-		return new TokenClaim(email, roles.stream().map(Object::toString).toList());
+		return new TokenClaim(userId, email, nickname, roles.stream().map(Object::toString).toList());
 	}
 }

@@ -12,6 +12,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class TokenClaim {
-	private String subject;
+	private Long subject; // user ID
+	private String email;
+	private String nickname;
 	private List<String> roles;
 }

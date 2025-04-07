@@ -8,10 +8,6 @@ import nbc.newsfeed.domain.service.auth.model.TokenClaim;
  * Created on : 2025. 3. 23.
  */
 public interface TokenService {
-	String generateAccessToken(TokenClaim tokenClaim);
-
-	String generateRefreshToken(TokenClaim tokenClaim);
-
 	Token generateToken(TokenClaim tokenClaim);
 
 	TokenClaim parseToken(String token);

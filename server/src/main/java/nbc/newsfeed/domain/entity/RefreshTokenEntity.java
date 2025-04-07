@@ -32,4 +32,11 @@ public class RefreshTokenEntity extends TimeBaseEntity {
 
 	@Column(nullable = false)
 	private LocalDateTime expiredAt;
+
+	public static RefreshTokenEntity of(String refreshToken, LocalDateTime expiredAt) {
+		return RefreshTokenEntity.builder()
+			.refreshToken(refreshToken)
+			.expiredAt(expiredAt)
+			.build();
+	}
 }

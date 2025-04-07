@@ -1,5 +1,7 @@
 package nbc.newsfeed.domain.service.auth.model;
 
+import java.util.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,4 +14,6 @@ import lombok.Getter;
 public class Token {
 	private String accessToken;
 	private String refreshToken;
+	private Date issuedAt;
+	private Date expiredAt;
 }
