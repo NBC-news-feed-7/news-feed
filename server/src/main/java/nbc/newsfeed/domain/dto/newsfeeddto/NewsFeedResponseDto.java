@@ -25,7 +25,7 @@ public class NewsFeedResponseDto {
         return NewsFeedResponseDto.builder()
                 .feedId(entity.getId())
                 .userId(entity.getUser().getId())
-                .nickName(entity.getUser().getName())
+                .nickName(entity.getUser().getNickname())
                 .title(entity.getTitle())
                 .content(entity.getContent())
                 .createdAt(entity.getCreatedAt())
