@@ -2,6 +2,9 @@ package nbc.newsfeed.domain.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,6 +24,8 @@ import lombok.ToString;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 때문에 무조건 있어야함
 @Table(name = "users")
+@SQLDelete(sql = "UPDATE users SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at is NULL") // where 는 depreacted 되었다고한다!
 @Entity
 public class UserEntity extends TimeBaseEntity {
 	@Id
@@ -45,5 +50,10 @@ public class UserEntity extends TimeBaseEntity {
 			.password(password)
 			.nickname(nickname)
 			.build();
+	}
+
+	public void update(String password, String nickname) {
+		this.password = password;
+		this.nickname = nickname;
 	}
 }
