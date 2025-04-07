@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import nbc.newsfeed.domain.repository.newsfeedLike.NewsFeedLikeRepository;
+
+import java.util.Optional;
 
 
 @ToString
@@ -33,4 +36,14 @@ public class NewsFeedLikeEntity extends TimeBaseEntity{
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity user;
+
+
+	public static NewsFeedLikeEntity of(NewsFeedEntity newsFeed, UserEntity user) {
+		return NewsFeedLikeEntity.builder()
+				.newsFeed(newsFeed)
+				.user(user)
+				.build();
+	}
+
+
 }
