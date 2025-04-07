@@ -2,6 +2,8 @@ package nbc.newsfeed.domain.service.newsfeed;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nbc.newsfeed.common.error.CustomException;
+import nbc.newsfeed.common.error.ErrorCode;
 import nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedResponseDto;
 import nbc.newsfeed.domain.entity.NewsFeedEntity;
 import nbc.newsfeed.domain.repository.newsfeed.NewsFeedRepository;
@@ -19,7 +21,7 @@ public class NewsFeedService {
     public NewsFeedResponseDto getNewsFeed(Long feedsId) {
 
         NewsFeedEntity newsFeedEntity = newsFeedRepository.findById(feedsId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
         //comment, newsfeedLike 수 가져오기 해야댐
 
         NewsFeedResponseDto responseDto = NewsFeedResponseDto.builder()

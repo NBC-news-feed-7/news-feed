@@ -15,7 +15,7 @@ public enum ErrorCode {
     DUPLICATED_EMAIL( "이미 등록된 이메일입니다.", HttpStatus.CONFLICT),
 
     // ✅ 뉴스피드 관련 에러
-    SCHEDULE_NOT_FOUND( "존재하지 않는 일정입니다", HttpStatus.NOT_FOUND),
+    NEWSFEED_NOT_FOUND( "존재하지 않는 피드입니다", HttpStatus.NOT_FOUND),
 
     // ✅ 댓글 관련 에러
     COMMENT_NOT_FOUND( "존재하지 않는 댓글입니다", HttpStatus.NOT_FOUND),
