@@ -24,16 +24,7 @@ public class NewsFeedService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
         //comment, newsfeedLike 수 가져오기 해야댐
 
-        NewsFeedResponseDto responseDto = NewsFeedResponseDto.builder()
-                .feedId(newsFeedEntity.getId())
-                .userId(newsFeedEntity.getUser().getId())
-                .nickName(newsFeedEntity.getUser().getName())
-                .title(newsFeedEntity.getTitle())
-                .content(newsFeedEntity.getContent())
-                .createdAt(newsFeedEntity.getCreatedAt())
-                .updatedAt(newsFeedEntity.getUpdatedAt())
-                .likeCount(0L)
-                .commentCount(0L).build();
+        NewsFeedResponseDto responseDto = NewsFeedResponseDto.fromEntity(newsFeedEntity, 0L, 0L);
         return responseDto;
     }
 
