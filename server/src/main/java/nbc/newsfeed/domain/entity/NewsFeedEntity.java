@@ -39,7 +39,7 @@ public class NewsFeedEntity extends TimeBaseEntity{
 	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity user;
 
-	public void deleteNewsFeed(NewsFeedUseYn useYn) {
+	public void visibleNewsFeed(NewsFeedUseYn useYn) {
 		this.useYn = useYn;
 	}
 }
