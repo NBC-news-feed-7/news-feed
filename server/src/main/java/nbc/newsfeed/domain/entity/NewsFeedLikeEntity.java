@@ -23,7 +23,7 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "news_feed_likes")
 @Entity
-public class NewsFeedLikeEntity {
+public class NewsFeedLikeEntity extends TimeBaseEntity{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
