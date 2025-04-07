@@ -14,47 +14,34 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import nbc.newsfeed.domain.repository.commentLike.CommentLikeRepository;
-
-import java.util.Optional;
-
 
 @ToString
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "comments")
+@Table(name = "news_files")
 @Entity
-public class CommentEntity extends TimeBaseEntity {
+public class NewsFileEntity extends TimeBaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(nullable = false)
-	private String content;
+	private String originalName;
 
-	@ManyToOne
-	@JoinColumn(name = "parent_comment_id", nullable = true)
-	private CommentEntity parentComment;
+	@Column(nullable = false, unique = true)
+	private String path;
 
-	@ManyToOne
-	@JoinColumn(name = "news_feed_id", nullable = false)
-	private NewsFeedEntity newsFeed;
+	private Long size;
+
+	// TODO UUID 없이 path로 하면 굳이 저장 안해도 될거 같음
 
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity user;
 
-	private Integer useYn;
-
-
-	public void toggleLike(UserEntity user, CommentLikeRepository likeRepository) {
-		Optional<CommentLikeEntity> existing = likeRepository.findByCommentAndUser(this, user);
-		existing.ifPresentOrElse(
-				likeRepository::delete,
-				() -> likeRepository.save(CommentLikeEntity.of(this, user))
-		);
-	}
-
+	@ManyToOne
+	@JoinColumn(name = "news_feed_id", nullable = false)
+	private NewsFeedEntity newsFeed;
 }

@@ -15,7 +15,7 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 때문에 무조건 있어야함
 @Table(name = "friend_requests")
 @Entity
-public class FriendRequestEntity {
+public class FriendRequestEntity extends TimeBaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
