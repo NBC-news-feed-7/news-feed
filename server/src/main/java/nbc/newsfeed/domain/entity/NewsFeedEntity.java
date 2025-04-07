@@ -14,6 +14,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import nbc.newsfeed.domain.repository.newsfeedLike.NewsFeedLikeRepository;
+
+import java.util.Optional;
 
 
 @ToString
@@ -40,4 +43,14 @@ public class NewsFeedEntity extends TimeBaseEntity{
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity user;
+
+
+	public void toggleLike(UserEntity user, NewsFeedLikeRepository likeRepository) {
+		Optional<NewsFeedLikeEntity> existing = likeRepository.findByNewsFeedAndUser(this, user);
+		existing.ifPresentOrElse(
+				likeRepository::delete,
+				() -> likeRepository.save(NewsFeedLikeEntity.of(this, user))
+		);
+	}
+
 }
