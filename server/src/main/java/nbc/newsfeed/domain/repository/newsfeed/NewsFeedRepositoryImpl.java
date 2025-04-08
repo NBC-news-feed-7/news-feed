@@ -1,5 +1,6 @@
 package nbc.newsfeed.domain.repository.newsfeed;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +22,16 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
 
 
     @Override
-    public Page<NewsFeedPageResponseDto> findFeedsWithSort(NewsFeedSortType sortType, Pageable pageable) {
+    public Page<NewsFeedPageResponseDto> searchFeeds(String keyword, NewsFeedSortType sortType, Pageable pageable) {
         QNewsFeedEntity news = QNewsFeedEntity.newsFeedEntity;
         QNewsFeedLikeEntity like = QNewsFeedLikeEntity.newsFeedLikeEntity;
         QCommentEntity comment = QCommentEntity.commentEntity;
+
+        BooleanBuilder where = new BooleanBuilder();
+        if (keyword != null && !keyword.isBlank()) {
+            where.and(news.title.containsIgnoreCase(keyword)
+                    .or(news.content.containsIgnoreCase(keyword)));
+        }
 
         List<NewsFeedPageResponseDto> content = queryFactory
                 .select(Projections.constructor(
@@ -41,6 +48,7 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
                 .from(news)
                 .leftJoin(like).on(like.newsFeed.eq(news))
                 .leftJoin(comment).on(comment.newsFeed.eq(news))
+                .where(where)
                 .groupBy(news.id)
                 .orderBy(sortType.getOrderBy(news, like))
                 .offset(pageable.getOffset())
@@ -50,8 +58,10 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
         long total = queryFactory
                 .select(news.countDistinct())
                 .from(news)
+                .where(where)
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total);
     }
+
 }

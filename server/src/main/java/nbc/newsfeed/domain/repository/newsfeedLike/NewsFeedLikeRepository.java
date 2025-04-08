@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface NewsFeedLikeRepository extends JpaRepository<NewsFeedLikeEntity, Long> {
+public interface NewsFeedLikeRepository extends JpaRepository<NewsFeedLikeEntity, Long>, NewsFeedLikeRepositoryCustom {
     Optional<NewsFeedLikeEntity> findByNewsFeedAndUser(NewsFeedEntity newsFeed, UserEntity user);
     int countByNewsFeed(Optional<NewsFeedEntity> newsFeed);
 }
