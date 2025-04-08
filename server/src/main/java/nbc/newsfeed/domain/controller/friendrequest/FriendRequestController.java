@@ -37,12 +37,12 @@ public class FriendRequestController {
     /**
      * ✅ 친구 요청 목록을 조회합니다.
      *
-     * @param userId 유저 ID
      * @return 친구 요청 목록
      */
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<List<FriendRequestResponseDto>> getFriendRequests(@PathVariable Long userId) {
-        return ResponseEntity.ok(friendRequestService.getFriendRequests(userId));
+    @GetMapping("/user")
+    public ResponseEntity<List<FriendRequestResponseDto>> getFriendRequests(Authentication authentication) {
+        Long currentUserId = Long.parseLong(authentication.getName());
+        return ResponseEntity.ok(friendRequestService.getFriendRequests(currentUserId));
     }
 
     /**
