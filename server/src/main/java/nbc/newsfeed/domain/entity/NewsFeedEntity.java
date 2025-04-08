@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import nbc.newsfeed.common.error.CustomException;
+import nbc.newsfeed.common.error.ErrorCode;
 import nbc.newsfeed.domain.dto.newsfeed.NewsFeedRequestDto;
 import nbc.newsfeed.domain.dto.newsfeed.NewsFeedUseYn;
 import static nbc.newsfeed.domain.dto.newsfeed.NewsFeedUseYn.Y;
@@ -44,13 +46,16 @@ public class NewsFeedEntity extends TimeBaseEntity{
 	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity user;
 
+	public void validateCanLike(UserEntity user, NewsFeedLikeRepository likeRepository) {
+		if (likeRepository.existsByNewsFeedAndUser(this, user)) {
+			throw new CustomException(ErrorCode.ALREADY_LIKED);
+		}
+	}
 
-	public void toggleLike(UserEntity user, NewsFeedLikeRepository likeRepository) {
-		Optional<NewsFeedLikeEntity> existing = likeRepository.findByNewsFeedAndUser(this, user);
-		existing.ifPresentOrElse(
-				likeRepository::delete,
-				() -> likeRepository.save(NewsFeedLikeEntity.of(this, user))
-		);
+	public void validateCanCancelLike(UserEntity user, NewsFeedLikeRepository likeRepository) {
+		if (!likeRepository.existsByNewsFeedAndUser(this, user)) {
+			throw new CustomException(ErrorCode.NOT_LIKED_YET);
+		}
 	}
 
 
