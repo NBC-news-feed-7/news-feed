@@ -41,6 +41,9 @@ public class UserEntity extends TimeBaseEntity {
 	@Column(nullable = false, length = 255)
 	private String password;
 
+	@Column
+	private String profileImageUrl;
+
 	@Column(nullable = true)
 	private LocalDateTime deletedAt;
 
@@ -55,5 +58,9 @@ public class UserEntity extends TimeBaseEntity {
 	public void update(String password, String nickname) {
 		this.password = password;
 		this.nickname = nickname;
+	}
+
+	public void changeProfileImage(String profileImageUrl) {
+		this.profileImageUrl = profileImageUrl;
 	}
 }

@@ -56,6 +56,16 @@ public class UserService {
 		return user;
 	}
 
+	@Transactional
+	public UserEntity changeProfileImage(final Long userId, final String profileImageUrl) {
+		UserEntity user = userRepository.findById(userId)
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+		user.changeProfileImage(profileImageUrl);
+
+		return user;
+	}
+
 	@Transactional(readOnly = true)
 	public UserEntity findById(final Long userId) {
 		return userRepository.findById(userId)

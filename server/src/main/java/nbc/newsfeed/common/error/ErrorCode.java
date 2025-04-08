@@ -18,19 +18,21 @@ public enum ErrorCode {
 	PASSWORD_MISMATCH("비밀번호가 일치하지 않습니다", HttpStatus.UNAUTHORIZED),
 	DUPLICATED_EMAIL("이미 등록된 이메일입니다.", HttpStatus.CONFLICT),
 	SAME_PASSWORD("이전 비밀번호와 동일한 비밀번호로 변경할 수 없습니다.", HttpStatus.BAD_REQUEST),
+	EMPTY_PROFILE_IMAGE("프로필 이미지가 비어 있습니다!", HttpStatus.BAD_REQUEST),
+	IMAGE_SAVE_FAIL("이미지 저장에 실패 했습니다!", HttpStatus.INTERNAL_SERVER_ERROR),
 
-    // ✅ 뉴스피드 관련 에러
-    NEWSFEED_NOT_FOUND( "존재하지 않는 피드입니다", HttpStatus.NOT_FOUND),
-    NEWSFEED_FORBIDDEN( "해당 피드에 대한 권한이 없습니다", HttpStatus.NOT_FOUND),
+	// ✅ 뉴스피드 관련 에러
+	NEWSFEED_NOT_FOUND("존재하지 않는 피드입니다", HttpStatus.NOT_FOUND),
+	NEWSFEED_FORBIDDEN("해당 피드에 대한 권한이 없습니다", HttpStatus.NOT_FOUND),
 
-    // ✅ 댓글 관련 에러
-    COMMENT_NOT_FOUND( "존재하지 않는 댓글입니다", HttpStatus.NOT_FOUND),
-    UNAUTHORIZED( "해당 댓글에 대한 권한이 없습니다", HttpStatus.UNAUTHORIZED),
+	// ✅ 댓글 관련 에러
+	COMMENT_NOT_FOUND("존재하지 않는 댓글입니다", HttpStatus.NOT_FOUND),
+	UNAUTHORIZED("해당 댓글에 대한 권한이 없습니다", HttpStatus.UNAUTHORIZED),
 
-    // ✅ 친구 요청 관련 에러
-    REQUEST_NOT_FOUND( "존재하지 않는 친구 요청입니다", HttpStatus.NOT_FOUND),
-    ALREADY_REQUESTED( "이미 친구 요청을 보냈습니다", HttpStatus.CONFLICT),
-    INVALID_STATUS( "유효하지 않은 친구 요청 상태입니다", HttpStatus.BAD_REQUEST);
+	// ✅ 친구 요청 관련 에러
+	REQUEST_NOT_FOUND("존재하지 않는 친구 요청입니다", HttpStatus.NOT_FOUND),
+	ALREADY_REQUESTED("이미 친구 요청을 보냈습니다", HttpStatus.CONFLICT),
+	INVALID_STATUS("유효하지 않은 친구 요청 상태입니다", HttpStatus.BAD_REQUEST);
 
 	private final String message;
 	private final HttpStatus status;
