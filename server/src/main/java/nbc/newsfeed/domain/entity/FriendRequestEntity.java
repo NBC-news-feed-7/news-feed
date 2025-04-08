@@ -32,4 +32,8 @@ public class FriendRequestEntity extends TimeBaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private FriendRequestStatus status;
+
+	public void updateStatus(FriendRequestStatus status) {
+		this.status = status;
+	}
 }
