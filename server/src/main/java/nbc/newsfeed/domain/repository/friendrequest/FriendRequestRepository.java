@@ -3,6 +3,8 @@ package nbc.newsfeed.domain.repository.friendrequest;
 import nbc.newsfeed.domain.entity.FriendRequestEntity;
 import nbc.newsfeed.domain.entity.UserEntity;
 import nbc.newsfeed.domain.dto.friendrequest.FriendRequestStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -24,4 +26,8 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequestEnti
     // 상태에 따른 요청 목록 조회 (예: 요청한 친구 관계만 보기 등)
     List<FriendRequestEntity> findAllByFromUserAndStatus(UserEntity fromUser, FriendRequestStatus status);
     List<FriendRequestEntity> findAllByToUserAndStatus(UserEntity toUser, FriendRequestStatus status);
+
+    boolean existsByFromUserIdAndToUserIdAndStatus(Long fromUserId, Long toUserId, FriendRequestStatus friendRequestStatus);
+
+    Page<FriendRequestEntity> findAllByStatus(FriendRequestStatus status, Pageable pageable);
 }

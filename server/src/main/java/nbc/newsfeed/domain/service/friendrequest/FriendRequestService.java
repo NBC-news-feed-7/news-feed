@@ -5,11 +5,14 @@ import nbc.newsfeed.common.error.CustomException;
 import nbc.newsfeed.common.error.ErrorCode;
 import nbc.newsfeed.domain.dto.friendrequest.request.FriendRequestRequestDto;
 import nbc.newsfeed.domain.dto.friendrequest.response.FriendRequestResponseDto;
+import nbc.newsfeed.domain.dto.friendrequest.response.FriendRequestPageResponseDto;
 import nbc.newsfeed.domain.entity.FriendRequestEntity;
 import nbc.newsfeed.domain.dto.friendrequest.FriendRequestStatus;
 import nbc.newsfeed.domain.entity.UserEntity;
 import nbc.newsfeed.domain.repository.friendrequest.FriendRequestRepository;
 import nbc.newsfeed.domain.repository.user.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +38,10 @@ public class FriendRequestService {
 
         if (fromUserId.equals(toUserId)) {
             throw new CustomException(ErrorCode.INVALID_STATUS);
+        }
+
+        if (friendRequestRepository.existsByFromUserIdAndToUserIdAndStatus(fromUserId, toUserId, FriendRequestStatus.ACCEPTED)) {
+            throw new CustomException(ErrorCode.ALREADY_FRIEND);
         }
 
         boolean exists = friendRequestRepository.existsByFromUserIdAndToUserId(fromUserId, toUserId);
@@ -79,6 +86,11 @@ public class FriendRequestService {
     public void cancelRequest(Long fromUserId, Long toUserId) {
         FriendRequestEntity request = friendRequestRepository.findByFromUserIdAndToUserId(fromUserId, toUserId)
                 .orElseThrow(() -> new CustomException(ErrorCode.REQUEST_NOT_FOUND));
+
+        if (request.getStatus() != FriendRequestStatus.REQUESTED) {
+            throw new CustomException(ErrorCode.INVALID_CANCEL);
+        }
+
         friendRequestRepository.delete(request);
     }
 
@@ -144,5 +156,29 @@ public class FriendRequestService {
     private UserEntity getUserOrThrow(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    /**
+     * ✅ 모든 친구 요청을 페이징 처리하여 조회합니다.
+     *
+     * <p>요청 상태(`FriendRequestStatus`)를 기준으로 필터링할 수 있으며,
+     * 상태 값이 없으면 전체 요청을 기준으로 조회합니다.</p>
+     *
+     * @param status   필터링할 요청 상태 (예: REQUESTED, ACCEPTED, REJECTED). null이면 전체 조회
+     * @param pageable 페이징 및 정렬 정보 (예: page, size, sort 등)
+     * @return 페이징된 친구 요청 DTO 목록
+     */
+    @Transactional(readOnly = true)
+    public FriendRequestPageResponseDto<FriendRequestResponseDto> getAllFriendRequestsPaged(FriendRequestStatus status, Pageable pageable) {
+        Page<FriendRequestEntity> page;
+
+        if (status != null) {
+            page = friendRequestRepository.findAllByStatus(status, pageable);
+        } else {
+            page = friendRequestRepository.findAll(pageable);
+        }
+
+        Page<FriendRequestResponseDto> dtoPage = page.map(FriendRequestResponseDto::from);
+        return FriendRequestPageResponseDto.from(dtoPage);
     }
 }
