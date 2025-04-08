@@ -115,6 +115,10 @@ public class FriendRequestService {
         FriendRequestEntity request = friendRequestRepository.findById(requestId)
                 .orElseThrow(() -> new CustomException(ErrorCode.REQUEST_NOT_FOUND));
 
+        if (request.getStatus() != FriendRequestStatus.REQUESTED) {
+            throw new CustomException(ErrorCode.INVALID_STATUS);
+        }
+
         request.updateStatus(status);
         return FriendRequestResponseDto.from(request);
     }
