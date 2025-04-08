@@ -4,15 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.newsfeed.common.error.CustomException;
 import nbc.newsfeed.common.error.ErrorCode;
-import nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedRequestDto;
-import nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedResponseDto;
-import nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedUseYn;
+import nbc.newsfeed.domain.dto.newsfeed.NewsFeedRequestDto;
+import nbc.newsfeed.domain.dto.newsfeed.NewsFeedResponseDto;
 import nbc.newsfeed.domain.entity.NewsFeedEntity;
 import nbc.newsfeed.domain.entity.UserEntity;
 import nbc.newsfeed.domain.repository.newsfeed.NewsFeedRepository;
-import org.springframework.http.HttpStatus;
+import nbc.newsfeed.domain.repository.user.UserRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -20,55 +19,58 @@ import org.springframework.web.server.ResponseStatusException;
 public class NewsFeedService {
 
     private final NewsFeedRepository newsFeedRepository;
+    private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public NewsFeedResponseDto getNewsFeed(Long feedsId) {
 
         NewsFeedEntity newsFeedEntity = newsFeedRepository.findById(feedsId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
-        //comment, newsfeedLike 수 가져오기 해야댐
 
-        NewsFeedResponseDto responseDto = NewsFeedResponseDto.fromEntity(newsFeedEntity, 0L, 0L);
-        return responseDto;
+        return NewsFeedResponseDto.fromEntity(newsFeedEntity);
     }
 
+    @Transactional
     public NewsFeedResponseDto createNewsFeed(Long userId, NewsFeedRequestDto requestDto){
-        //userRepository에서 유저 찾아야댐
-        UserEntity findUser = UserEntity.builder()
-                .nickname("test")
-                .email("test")
-                .password("test")
-                .id(userId).build();
+        //유저 찾기
+        UserEntity findUser = userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        //피드 엔티티 생성
         NewsFeedEntity createNewsFeedEntity = NewsFeedEntity.builder()
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
                 .user(findUser).build();
-        NewsFeedEntity savedNewsFeed = newsFeedRepository.save(createNewsFeedEntity);
-        //comment, newsfeedLike 수 가져오기 해야댐
-        return NewsFeedResponseDto.fromEntity(savedNewsFeed, 0L, 0L);
+        //피드 저장
+        NewsFeedEntity savedNewsFeedEntity = newsFeedRepository.save(createNewsFeedEntity);
+
+        return NewsFeedResponseDto.fromEntity(savedNewsFeedEntity);
     }
 
-    public NewsFeedResponseDto updateNewsFeed(Long userId, NewsFeedRequestDto requestDto){
 
-        //유저찾는거 해야댐
-        UserEntity findUser = UserEntity.builder()
-                .nickname("test")
-                .email("test")
-                .password("test")
-                .id(userId).build();
-        //업데이트로직 작성해야댐
-        NewsFeedEntity createNewsFeedEntity = NewsFeedEntity.builder()
-                .title(requestDto.getTitle())
-                .content(requestDto.getContent())
-                .user(findUser).build();
-        NewsFeedEntity savedNewsFeed = newsFeedRepository.save(createNewsFeedEntity);
-        //comment, newsfeedLike 수 가져오기 해야댐
-        return NewsFeedResponseDto.fromEntity(savedNewsFeed, 0L, 0L);
+    @Transactional
+    public NewsFeedResponseDto updateNewsFeed(Long userId, Long feedsId, NewsFeedRequestDto requestDto){
+
+        //유저찾기
+        UserEntity findUser = userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        //피드 찾기
+        NewsFeedEntity findNewsFeedEntity = newsFeedRepository.findById(feedsId)
+                .orElseThrow(()->new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
+        //권한 확인
+        if(!findNewsFeedEntity.getUser().getId().equals(findUser.getId())){ //UserEntity equals 메서드 재정의 필요할수도
+            throw new CustomException(ErrorCode.NEWSFEED_FORBIDDEN);
+        }
+        findNewsFeedEntity.update(requestDto);
+        return NewsFeedResponseDto.fromEntity(findNewsFeedEntity);
     }
 
+    @Transactional
     public void deleteNewsFeed(Long userId, Long feedsId){
 
+        //피드찾기
         NewsFeedEntity findNewsFeed = newsFeedRepository.findById(feedsId)
                                     .orElseThrow(()->new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
+        //권한 확인
         if(!findNewsFeed.getUser().getId().equals(userId)){
             throw new CustomException(ErrorCode.NEWSFEED_FORBIDDEN);
         }

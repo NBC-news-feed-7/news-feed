@@ -1,4 +1,4 @@
-package nbc.newsfeed.domain.dto.newsfeeddto;
+package nbc.newsfeed.domain.dto.newsfeed;
 
 
 import lombok.Builder;
@@ -6,6 +6,7 @@ import lombok.Getter;
 import nbc.newsfeed.domain.entity.NewsFeedEntity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -18,10 +19,9 @@ public class NewsFeedResponseDto {
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Long likeCount;
-    private Long commentCount;
 
-    public static NewsFeedResponseDto fromEntity(NewsFeedEntity entity, Long likeCount, Long commentCount) {
+
+    public static NewsFeedResponseDto fromEntity(NewsFeedEntity entity) {
         return NewsFeedResponseDto.builder()
                 .feedId(entity.getId())
                 .userId(entity.getUser().getId())
@@ -30,8 +30,6 @@ public class NewsFeedResponseDto {
                 .content(entity.getContent())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
-                .likeCount(likeCount)
-                .commentCount(commentCount)
                 .build();
     }
 
