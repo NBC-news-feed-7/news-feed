@@ -1,4 +1,4 @@
-package nbc.newsfeed.domain.dto.newsfeeddto;
+package nbc.newsfeed.domain.dto.newsfeed;
 
 import com.querydsl.core.types.OrderSpecifier;
 import nbc.newsfeed.domain.entity.QNewsFeedEntity;

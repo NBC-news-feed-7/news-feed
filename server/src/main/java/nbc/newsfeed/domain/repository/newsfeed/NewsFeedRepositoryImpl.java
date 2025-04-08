@@ -3,8 +3,8 @@ package nbc.newsfeed.domain.repository.newsfeed;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedResponseDto;
-import nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedSortType;
+import nbc.newsfeed.domain.dto.newsfeed.NewsFeedPageResponseDto;
+import nbc.newsfeed.domain.dto.newsfeed.NewsFeedSortType;
 import nbc.newsfeed.domain.entity.QCommentEntity;
 import nbc.newsfeed.domain.entity.QNewsFeedEntity;
 import nbc.newsfeed.domain.entity.QNewsFeedLikeEntity;
@@ -21,14 +21,14 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
 
 
     @Override
-    public Page<NewsFeedResponseDto> findFeedsWithSort(NewsFeedSortType sortType, Pageable pageable) {
+    public Page<NewsFeedPageResponseDto> findFeedsWithSort(NewsFeedSortType sortType, Pageable pageable) {
         QNewsFeedEntity news = QNewsFeedEntity.newsFeedEntity;
         QNewsFeedLikeEntity like = QNewsFeedLikeEntity.newsFeedLikeEntity;
         QCommentEntity comment = QCommentEntity.commentEntity;
 
-        List<NewsFeedResponseDto> content = queryFactory
+        List<NewsFeedPageResponseDto> content = queryFactory
                 .select(Projections.constructor(
-                        NewsFeedResponseDto.class,
+                        NewsFeedPageResponseDto.class,
                         news.id,
                         news.user.id,
                         news.user.nickname,
