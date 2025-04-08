@@ -3,6 +3,7 @@ package nbc.newsfeed.domain.controller.newsfeedLike;
 import lombok.RequiredArgsConstructor;
 import nbc.newsfeed.domain.service.newsfeedLike.NewsFeedLikeService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,8 +15,9 @@ public class NewsFeedLikeController {
     @PostMapping("/{newsId}/like")
     public ResponseEntity<Void> toggleLike(
             @PathVariable Long newsId,
-            @RequestParam Long userId
+            Authentication authentication
     ) {
+        long userId = Long.parseLong(authentication.getName());
         newsFeedLikeService.toggleLike(newsId, userId);
         return ResponseEntity.ok().build();
     }
