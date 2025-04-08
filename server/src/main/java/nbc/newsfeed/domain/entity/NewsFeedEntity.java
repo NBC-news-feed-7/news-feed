@@ -14,6 +14,8 @@ import nbc.newsfeed.domain.repository.newsfeedLike.NewsFeedLikeRepository;
 
 import java.util.Optional;
 
+import static nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedUseYn.Y;
+
 
 @ToString
 @Getter

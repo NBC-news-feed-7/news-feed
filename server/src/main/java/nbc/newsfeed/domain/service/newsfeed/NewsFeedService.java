@@ -26,6 +26,7 @@ public class NewsFeedService {
 
         NewsFeedEntity newsFeedEntity = newsFeedRepository.findById(feedsId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
+        //comment, newsfeedLike 수 가져오기 해야댐
 
         return NewsFeedDto.fromEntity(newsFeedEntity);
     }
@@ -77,7 +78,9 @@ public class NewsFeedService {
         newsFeedRepository.delete(findNewsFeed);
     }
 
-
-
+    @Transactional(readOnly = true)
+    public Page<NewsFeedResponseDto> getFeedsBySort(NewsFeedSortType sortType, Pageable pageable) {
+        return newsFeedRepository.findFeedsWithSort(sortType, pageable);
+    }
 
 }
