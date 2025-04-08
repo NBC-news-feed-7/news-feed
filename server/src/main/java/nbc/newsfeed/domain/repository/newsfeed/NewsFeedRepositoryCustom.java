@@ -7,5 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface NewsFeedRepositoryCustom {
-    Page<NewsFeedPageResponseDto> findFeedsWithSort(NewsFeedSortType sortType, Pageable pageable);
+    Page<NewsFeedPageResponseDto> searchFeeds(String keyword, NewsFeedSortType sortType, Pageable pageable);
+
 }

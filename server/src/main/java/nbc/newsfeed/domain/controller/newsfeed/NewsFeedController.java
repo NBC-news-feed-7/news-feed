@@ -7,8 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import nbc.newsfeed.domain.dto.newsfeed.*;
 import nbc.newsfeed.domain.service.newsfeed.NewsFeedService;
 import nbc.newsfeed.domain.service.newsfeedLike.NewsFeedLikeService;
+import nbc.newsfeed.domain.dto.newsfeed.NewsFeedSortType;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,14 +67,12 @@ public class NewsFeedController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<NewsFeedPageResponseDto>> getNewsFeedsBySort(
-            @RequestParam(defaultValue = "LATEST") String sort,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+    public ResponseEntity<Page<NewsFeedPageResponseDto>> getFeedsByKeyword(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "LATEST") NewsFeedSortType sortType,
+            Pageable pageable
     ) {
-        NewsFeedSortType sortType = NewsFeedSortType.valueOf(sort.toUpperCase());
-        Pageable pageable = PageRequest.of(page, size);
-        Page<NewsFeedPageResponseDto> result = newsFeedService.getFeedsBySort(sortType, pageable);
-        return ResponseEntity.ok(result);
+        Page<NewsFeedPageResponseDto> feeds = newsFeedService.getFeedsByKeyword(keyword, sortType, pageable);
+        return ResponseEntity.ok(feeds);
     }
 }
