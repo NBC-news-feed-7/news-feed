@@ -6,10 +6,14 @@ import nbc.newsfeed.common.error.CustomException;
 import nbc.newsfeed.common.error.ErrorCode;
 import nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedRequestDto;
 import nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedResponseDto;
+import nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedSortType;
 import nbc.newsfeed.domain.entity.NewsFeedEntity;
 import nbc.newsfeed.domain.entity.UserEntity;
 import nbc.newsfeed.domain.repository.newsfeed.NewsFeedRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -72,5 +76,9 @@ public class NewsFeedService {
         newsFeedRepository.delete(findNewsFeed);
     }
 
+    @Transactional(readOnly = true)
+    public List<NewsFeedResponseDto> getFeedsBySort(NewsFeedSortType sortType) {
+        return newsFeedRepository.findFeedsWithSort(sortType);
+    }
 
 }
