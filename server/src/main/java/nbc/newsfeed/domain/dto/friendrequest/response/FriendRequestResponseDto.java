@@ -1,7 +1,9 @@
-package nbc.newsfeed.domain.entity;
+package nbc.newsfeed.domain.dto.friendrequest.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import nbc.newsfeed.domain.dto.friendrequest.FriendRequestStatus;
+import nbc.newsfeed.domain.entity.FriendRequestEntity;
 
 
 @Getter

@@ -4,12 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.newsfeed.common.error.CustomException;
 import nbc.newsfeed.common.error.ErrorCode;
-import nbc.newsfeed.domain.dto.newsfeed.NewsFeedRequestDto;
 import nbc.newsfeed.domain.dto.newsfeed.NewsFeedDto;
+import nbc.newsfeed.domain.dto.newsfeed.NewsFeedPageResponseDto;
+import nbc.newsfeed.domain.dto.newsfeed.NewsFeedRequestDto;
+import nbc.newsfeed.domain.dto.newsfeed.NewsFeedSortType;
 import nbc.newsfeed.domain.entity.NewsFeedEntity;
 import nbc.newsfeed.domain.entity.UserEntity;
 import nbc.newsfeed.domain.repository.newsfeed.NewsFeedRepository;
 import nbc.newsfeed.domain.repository.user.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,15 +30,16 @@ public class NewsFeedService {
 
         NewsFeedEntity newsFeedEntity = newsFeedRepository.findById(feedsId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
+        //comment, newsfeedLike 수 가져오기 해야댐
 
         return NewsFeedDto.fromEntity(newsFeedEntity);
     }
 
     @Transactional
-    public NewsFeedDto createNewsFeed(Long userId, NewsFeedRequestDto requestDto){
+    public NewsFeedDto createNewsFeed(Long userId, NewsFeedRequestDto requestDto) {
         //유저 찾기
         UserEntity findUser = userRepository.findById(userId)
-                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         //피드 엔티티 생성
         NewsFeedEntity createNewsFeedEntity = NewsFeedEntity.builder()
                 .title(requestDto.getTitle())
@@ -48,16 +53,16 @@ public class NewsFeedService {
 
 
     @Transactional
-    public NewsFeedDto updateNewsFeed(Long userId, Long feedsId, NewsFeedRequestDto requestDto){
+    public NewsFeedDto updateNewsFeed(Long userId, Long feedsId, NewsFeedRequestDto requestDto) {
 
         //유저찾기
         UserEntity findUser = userRepository.findById(userId)
-                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         //피드 찾기
         NewsFeedEntity findNewsFeedEntity = newsFeedRepository.findById(feedsId)
-                .orElseThrow(()->new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
         //권한 확인
-        if(!findNewsFeedEntity.getUser().getId().equals(findUser.getId())){ //UserEntity equals 메서드 재정의 필요할수도
+        if (!findNewsFeedEntity.getUser().getId().equals(findUser.getId())) { //UserEntity equals 메서드 재정의 필요할수도
             throw new CustomException(ErrorCode.NEWSFEED_FORBIDDEN);
         }
         findNewsFeedEntity.update(requestDto);
@@ -65,19 +70,21 @@ public class NewsFeedService {
     }
 
     @Transactional
-    public void deleteNewsFeed(Long userId, Long feedsId){
+    public void deleteNewsFeed(Long userId, Long feedsId) {
 
         //피드찾기
         NewsFeedEntity findNewsFeed = newsFeedRepository.findById(feedsId)
-                                    .orElseThrow(()->new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
         //권한 확인
-        if(!findNewsFeed.getUser().getId().equals(userId)){
+        if (!findNewsFeed.getUser().getId().equals(userId)) {
             throw new CustomException(ErrorCode.NEWSFEED_FORBIDDEN);
         }
         newsFeedRepository.delete(findNewsFeed);
     }
 
-
-
+    @Transactional(readOnly = true)
+    public Page<NewsFeedPageResponseDto> getFeedsBySort(NewsFeedSortType sortType, Pageable pageable) {
+        return newsFeedRepository.findFeedsWithSort(sortType, pageable);
+    }
 
 }
