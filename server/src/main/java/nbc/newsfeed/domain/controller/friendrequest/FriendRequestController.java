@@ -68,7 +68,7 @@ public class FriendRequestController {
      * @param friendRequestId 친구 요청 ID
      * @return 변경된 친구 요청 정보
      */
-    @PutMapping("/{friendRequestId}")
+    @PutMapping("/{friendRequestId}/accept")
     public ResponseEntity<FriendRequestResponseDto> acceptRequest(@PathVariable Long friendRequestId) {
         return ResponseEntity.ok(friendRequestService.acceptRequest(friendRequestId));
     }
@@ -79,7 +79,7 @@ public class FriendRequestController {
      * @param friendRequestId 친구 요청 ID
      * @return 변경된 친구 요청 정보
      */
-    @PostMapping("/{friendRequestId}")
+    @PutMapping("/{friendRequestId}/reject")
     public ResponseEntity<FriendRequestResponseDto> rejectRequest(@PathVariable Long friendRequestId) {
         return ResponseEntity.ok(friendRequestService.rejectRequest(friendRequestId));
     }
