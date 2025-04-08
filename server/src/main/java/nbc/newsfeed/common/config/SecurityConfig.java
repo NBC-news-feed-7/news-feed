@@ -35,7 +35,7 @@ import nbc.newsfeed.domain.service.auth.TokenService;
 @RequiredArgsConstructor
 public class SecurityConfig {
 	private static final String[] AUTH_ALLOWLIST = {
-		"/swagger-ui/**", "/images/**",
+		"/swagger-ui/**", "/images/**", "/uploads/**"
 	};
 
 	private final TokenService tokenService;

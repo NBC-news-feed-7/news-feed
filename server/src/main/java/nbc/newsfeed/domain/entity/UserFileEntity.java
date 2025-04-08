@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+// TODO Profile 이미지 외에 유저 파일을 관리할 일이 있나? 제거 예정
 @ToString
 @Getter
 @Builder
