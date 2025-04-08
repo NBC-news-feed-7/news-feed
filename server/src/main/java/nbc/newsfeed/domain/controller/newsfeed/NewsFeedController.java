@@ -1,11 +1,15 @@
 package nbc.newsfeed.domain.controller.newsfeed;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import nbc.newsfeed.domain.dto.newsfeed.NewsFeedDetailResponseDto;
+import nbc.newsfeed.domain.dto.newsfeed.NewsFeedRequestDto;
+import nbc.newsfeed.domain.service.newsfeedLike.NewsFeedLikeService;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import lombok.extern.slf4j.Slf4j;
-import nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedRequestDto;
-import nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedResponseDto;
-import nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedSortType;
+import nbc.newsfeed.domain.dto.newsfeed.NewsFeedDto;
 import nbc.newsfeed.domain.service.newsfeed.NewsFeedService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,32 +26,37 @@ import org.springframework.web.bind.annotation.*;
 public class NewsFeedController {
 
     private final NewsFeedService newsFeedService;
+    private final NewsFeedLikeService newsFeedLikeService;
 
     @GetMapping("/{feedsId}")
-    public ResponseEntity<NewsFeedResponseDto> getNewsFeed(
-            @PathVariable Long feedsId
-    ) {
-        NewsFeedResponseDto responseDto = newsFeedService.getNewsFeed(feedsId);
+    public ResponseEntity<NewsFeedDetailResponseDto> getNewsFeed(
+            @PathVariable Long feedsId,
+            Authentication authentication
+    ){
+        NewsFeedDto newsFeedDto = newsFeedService.getNewsFeed(feedsId);
+        int likeCount = newsFeedLikeService.getLikeCount(feedsId);
+        NewsFeedDetailResponseDto responseDto = NewsFeedDetailResponseDto.fromDto(newsFeedDto,likeCount);
         return ResponseEntity.ok(responseDto);
     }
 
     @PostMapping
-    public ResponseEntity<NewsFeedResponseDto> createNewsFeed(
+    public ResponseEntity<NewsFeedDto> createNewsFeed(
             Authentication authentication,
-            @RequestBody NewsFeedRequestDto requestDto
-    ) {
+            @Valid @RequestBody NewsFeedRequestDto requestDto
+            ){
         Long userId = Long.parseLong(authentication.getName());
-        NewsFeedResponseDto responseDto = newsFeedService.createNewsFeed(userId, requestDto);
+        NewsFeedDto responseDto = newsFeedService.createNewsFeed(userId, requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
     @PutMapping("/{feedsId}")
-    public ResponseEntity<NewsFeedResponseDto> updateNewsFeed(
-            Authentication authentication,
-            @RequestBody NewsFeedRequestDto requestDto
-    ) {
+    public ResponseEntity<NewsFeedDto> updateNewsFeed(
+            @PathVariable Long feedsId,
+        Authentication authentication,
+        @Valid @RequestBody NewsFeedRequestDto requestDto
+    ){
         Long userId = Long.parseLong(authentication.getName());
-        NewsFeedResponseDto responseDto = newsFeedService.updateNewsFeed(userId, requestDto);
+        NewsFeedDto responseDto = newsFeedService.updateNewsFeed(userId, feedsId, requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
@@ -55,7 +64,7 @@ public class NewsFeedController {
     public ResponseEntity<Void> deleteNewsFeed(
             @PathVariable Long feedsId,
             Authentication authentication
-    ) {
+    ){
         Long userId = Long.parseLong(authentication.getName());
         newsFeedService.deleteNewsFeed(userId, feedsId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

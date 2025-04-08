@@ -1,4 +1,4 @@
-package nbc.newsfeed.domain.dto.newsfeeddto;
+package nbc.newsfeed.domain.dto.newsfeed;
 
 public enum NewsFeedUseYn {
     Y("y"), N("N");

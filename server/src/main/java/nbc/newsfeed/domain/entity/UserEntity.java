@@ -17,32 +17,39 @@ import java.time.LocalDateTime;
 @SQLRestriction("deleted_at is NULL") // where 는 depreacted 되었다고한다!
 @Entity
 public class UserEntity extends TimeBaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = false, length = 10)
-    private String nickname;
+	@Column(nullable = false, length = 10)
+	private String nickname;
 
-    @Column(nullable = false, unique = true, length = 255)
-    private String email;
+	@Column(nullable = false, unique = true, length = 255)
+	private String email;
 
-    @Column(nullable = false, length = 255)
-    private String password;
+	@Column(nullable = false, length = 255)
+	private String password;
 
-    @Column(nullable = true)
-    private LocalDateTime deletedAt;
+	@Column
+	private String profileImageUrl;
 
-    public static UserEntity withRegisterInfo(String email, String password, String nickname) {
-        return UserEntity.builder()
-                .email(email)
-                .password(password)
-                .nickname(nickname)
-                .build();
-    }
+	@Column(nullable = true)
+	private LocalDateTime deletedAt;
 
-    public void update(String password, String nickname) {
-        this.password = password;
-        this.nickname = nickname;
-    }
+	public static UserEntity withRegisterInfo(String email, String password, String nickname) {
+		return UserEntity.builder()
+			.email(email)
+			.password(password)
+			.nickname(nickname)
+			.build();
+	}
+
+	public void update(String password, String nickname) {
+		this.password = password;
+		this.nickname = nickname;
+	}
+
+	public void changeProfileImage(String profileImageUrl) {
+		this.profileImageUrl = profileImageUrl;
+	}
 }
