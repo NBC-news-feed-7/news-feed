@@ -1,13 +1,15 @@
 package nbc.newsfeed.domain.controller.comment;
 
-import lombok.Getter;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import nbc.newsfeed.domain.dto.comment.response.CommentResponse;
+import nbc.newsfeed.domain.dto.comment.request.CreateCommentRequestDTO;
+import nbc.newsfeed.domain.dto.comment.request.UpdateCommentRequestDTO;
+import nbc.newsfeed.domain.dto.comment.response.CommentResponseDTO;
+import nbc.newsfeed.domain.dto.comment.response.PutCommentResponseDTO;
 import nbc.newsfeed.domain.service.comment.CommentService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -17,10 +19,39 @@ import java.util.List;
 public class CommentController {
     private final CommentService commentService;
     @GetMapping
-    public List<CommentResponse> getComments(
-            @RequestParam Long id
+    public List<CommentResponseDTO> getComments(
+            @RequestParam Long feedId
     ){
-        List<CommentResponse> commentResponses = commentService.getCommentsByNewsFeedId(id);
-        return null;
+        List<CommentResponseDTO> commentResponses = commentService.getCommentsByNewsFeedId(feedId);
+        return commentResponses;
+    }
+    @PostMapping
+    public ResponseEntity<CommentResponseDTO> createComment(
+            Authentication authentication,
+            @Valid @RequestBody CreateCommentRequestDTO createCommentRequestDTO
+    ){
+        Long userId = Long.parseLong(authentication.getName());
+        CommentResponseDTO commentResponseDTO = commentService.createComment(userId, createCommentRequestDTO);
+        return ResponseEntity.ok(commentResponseDTO);
+    }
+    @PutMapping
+    public ResponseEntity<PutCommentResponseDTO> updateComment(
+            Authentication authentication,
+            @Valid @RequestBody UpdateCommentRequestDTO updateCommentRequestDTO
+    ){
+        Long userId = Long.parseLong(authentication.getName());
+        PutCommentResponseDTO updatedComment = commentService.updateComment(userId, updateCommentRequestDTO);
+        System.out.println(updatedComment);
+        return ResponseEntity.ok(updatedComment);
+    }
+    @DeleteMapping
+    public ResponseEntity<Void> deleteComment(
+            Authentication authentication,
+            @RequestParam Long commentId
+    ){
+        Long userId = Long.parseLong(authentication.getName());
+        // 소프트 딜리트
+        commentService.deleteComment(commentId,userId);
+        return ResponseEntity.noContent().build();
     }
 }
