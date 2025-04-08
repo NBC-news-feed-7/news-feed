@@ -37,6 +37,10 @@ public class FriendRequestService {
             throw new CustomException(ErrorCode.INVALID_STATUS);
         }
 
+        if (friendRequestRepository.existsByFromUserIdAndToUserIdAndStatus(fromUserId, toUserId, FriendRequestStatus.ACCEPTED)) {
+            throw new CustomException(ErrorCode.ALREADY_FRIEND);
+        }
+
         boolean exists = friendRequestRepository.existsByFromUserIdAndToUserId(fromUserId, toUserId);
         if (exists) {
             throw new CustomException(ErrorCode.ALREADY_REQUESTED);
@@ -79,6 +83,11 @@ public class FriendRequestService {
     public void cancelRequest(Long fromUserId, Long toUserId) {
         FriendRequestEntity request = friendRequestRepository.findByFromUserIdAndToUserId(fromUserId, toUserId)
                 .orElseThrow(() -> new CustomException(ErrorCode.REQUEST_NOT_FOUND));
+
+        if (request.getStatus() != FriendRequestStatus.REQUESTED) {
+            throw new CustomException(ErrorCode.INVALID_CANCEL);
+        }
+
         friendRequestRepository.delete(request);
     }
 
