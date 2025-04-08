@@ -24,4 +24,6 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequestEnti
     // 상태에 따른 요청 목록 조회 (예: 요청한 친구 관계만 보기 등)
     List<FriendRequestEntity> findAllByFromUserAndStatus(UserEntity fromUser, FriendRequestStatus status);
     List<FriendRequestEntity> findAllByToUserAndStatus(UserEntity toUser, FriendRequestStatus status);
+
+    boolean existsByFromUserIdAndToUserIdAndStatus(Long fromUserId, Long toUserId, FriendRequestStatus friendRequestStatus);
 }
