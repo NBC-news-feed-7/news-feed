@@ -34,7 +34,6 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
                         news.user.nickname,
                         news.title,
                         news.content,
-                        news.createdAt,
                         news.updatedAt,
                         like.countDistinct(),
                         comment.countDistinct()
