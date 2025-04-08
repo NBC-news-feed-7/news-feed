@@ -14,6 +14,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import nbc.newsfeed.domain.repository.commentLike.CommentLikeRepository;
+
+import java.util.Optional;
 
 
 @ToString
@@ -44,4 +47,14 @@ public class CommentEntity extends TimeBaseEntity {
 	private UserEntity user;
 
 	private Integer useYn;
+
+
+	public void toggleLike(UserEntity user, CommentLikeRepository likeRepository) {
+		Optional<CommentLikeEntity> existing = likeRepository.findByCommentAndUser(this, user);
+		existing.ifPresentOrElse(
+				likeRepository::delete,
+				() -> likeRepository.save(CommentLikeEntity.of(this, user))
+		);
+	}
+
 }
