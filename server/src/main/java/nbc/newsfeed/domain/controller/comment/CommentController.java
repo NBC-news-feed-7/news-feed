@@ -41,7 +41,6 @@ public class CommentController {
     ){
         Long userId = Long.parseLong(authentication.getName());
         PutCommentResponseDTO updatedComment = commentService.updateComment(userId, updateCommentRequestDTO);
-        System.out.println(updatedComment);
         return ResponseEntity.ok(updatedComment);
     }
     @DeleteMapping

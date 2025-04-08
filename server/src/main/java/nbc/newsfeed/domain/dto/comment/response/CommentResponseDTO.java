@@ -3,6 +3,8 @@ package nbc.newsfeed.domain.dto.comment.response;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -18,5 +20,8 @@ public class CommentResponseDTO {
     private int likeCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    @Builder.Default
+    private List<CommentResponseDTO> children = new ArrayList<>();
+
 
 }

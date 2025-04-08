@@ -15,9 +15,9 @@ import nbc.newsfeed.domain.repository.commentLike.CommentLikeRepository;
 import nbc.newsfeed.domain.repository.newsfeed.NewsFeedRepository;
 import nbc.newsfeed.domain.repository.user.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,26 +28,47 @@ public class CommentService {
     private final CommentLikeRepository commentLikeRepository;
     private final UserRepository userRepository;
 
+    public int getLikeCount(CommentEntity comment) {
+        return commentLikeRepository.countByComment(Optional.ofNullable(comment));
+    }
+
     public List<CommentResponseDTO> getCommentsByNewsFeedId(Long feedId) {
         NewsFeedEntity newsFeed = newsFeedRepository.findById(feedId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
         List<CommentEntity> comments = commentRepository.findAllByNewsFeed(newsFeed)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
-        return comments.stream()
-                .map(comment -> new CommentResponseDTO(
-                        comment.getId(),
-                        comment.getUser().getNickname(),
-                        comment.getContent(),
-                        comment.getParentComment() != null ? comment.getParentComment().getId() : null,
-                        newsFeed.getId(),
-                        getLikeCount(comment),
-                        comment.getCreatedAt(),
-                        comment.getUpdatedAt()
-                )).collect(Collectors.toList());
+
+        Map<Long, CommentResponseDTO> dtoMap = new HashMap<>();
+        List<CommentResponseDTO> rootComments = new ArrayList<>();
+
+        for (CommentEntity comment : comments) {
+            CommentResponseDTO dto = CommentResponseDTO.builder()
+                    .id(comment.getId())
+                    .nickname(comment.getUser().getNickname())
+                    .content(comment.getContent())
+                    .parentCommentId(comment.getParentComment() != null ? comment.getParentComment().getId() : null)
+                    .newsFeedId(newsFeed.getId())
+                    .likeCount(getLikeCount(comment))
+                    .createdAt(comment.getCreatedAt())
+                    .updatedAt(comment.getUpdatedAt())
+                    .build();
+
+            dtoMap.put(dto.getId(), dto);
+        }
+
+        for (CommentResponseDTO dto : dtoMap.values()) {
+            if (dto.getParentCommentId() == null) {
+                rootComments.add(dto);
+            } else {
+                CommentResponseDTO parent = dtoMap.get(dto.getParentCommentId());
+                if (parent != null) {
+                    parent.getChildren().add(dto);
+                }
+            }
+        }
+        return rootComments;
     }
-    public int getLikeCount(CommentEntity comment) {
-        return commentLikeRepository.countByComment(Optional.ofNullable(comment));
-    }
+
 
     public CommentResponseDTO createComment(Long userId, CreateCommentRequestDTO createCommentRequestDTO) {
         UserEntity user = userRepository.findById(userId)
@@ -67,23 +88,21 @@ public class CommentService {
                 .parentComment(parentComment)
                 .build();
         CommentEntity saved = commentRepository.save(comment);
-
-        return new CommentResponseDTO(
-                saved.getId(),
-                saved.getUser().getNickname(),
-                saved.getContent(),
-                saved.getParentComment() != null ? saved.getParentComment().getId() : null,
-                saved.getNewsFeed().getId(),
-                0,
-                saved.getCreatedAt(),
-                saved.getUpdatedAt()
-        );
+        return CommentResponseDTO.builder()
+                .id(saved.getId())
+                .nickname(saved.getUser().getNickname())
+                .content(saved.getContent())
+                .parentCommentId(saved.getParentComment() != null ? saved.getParentComment().getId() : null)
+                .newsFeedId(saved.getNewsFeed().getId())
+                .likeCount(0)
+                .createdAt(saved.getCreatedAt())
+                .updatedAt(saved.getUpdatedAt())
+                .build();
     }
 
     public PutCommentResponseDTO updateComment(Long userId, UpdateCommentRequestDTO updateCommentRequestDTO) {
         CommentEntity comment = commentRepository.findById(updateCommentRequestDTO.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
-        System.out.println("test" + comment);
         if (!comment.getUser().getId().equals(userId)) {
             throw new CustomException(ErrorCode.FORBIDDEN); // 본인이 작성한 댓글만 수정 가능
         }
