@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import nbc.newsfeed.common.error.CustomException;
 import nbc.newsfeed.common.error.ErrorCode;
 import nbc.newsfeed.domain.dto.newsfeed.NewsFeedRequestDto;
-import nbc.newsfeed.domain.dto.newsfeed.NewsFeedResponseDto;
+import nbc.newsfeed.domain.dto.newsfeed.NewsFeedDto;
 import nbc.newsfeed.domain.entity.NewsFeedEntity;
 import nbc.newsfeed.domain.entity.UserEntity;
 import nbc.newsfeed.domain.repository.newsfeed.NewsFeedRepository;
@@ -22,16 +22,16 @@ public class NewsFeedService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public NewsFeedResponseDto getNewsFeed(Long feedsId) {
+    public NewsFeedDto getNewsFeed(Long feedsId) {
 
         NewsFeedEntity newsFeedEntity = newsFeedRepository.findById(feedsId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
 
-        return NewsFeedResponseDto.fromEntity(newsFeedEntity);
+        return NewsFeedDto.fromEntity(newsFeedEntity);
     }
 
     @Transactional
-    public NewsFeedResponseDto createNewsFeed(Long userId, NewsFeedRequestDto requestDto){
+    public NewsFeedDto createNewsFeed(Long userId, NewsFeedRequestDto requestDto){
         //유저 찾기
         UserEntity findUser = userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -43,12 +43,12 @@ public class NewsFeedService {
         //피드 저장
         NewsFeedEntity savedNewsFeedEntity = newsFeedRepository.save(createNewsFeedEntity);
 
-        return NewsFeedResponseDto.fromEntity(savedNewsFeedEntity);
+        return NewsFeedDto.fromEntity(savedNewsFeedEntity);
     }
 
 
     @Transactional
-    public NewsFeedResponseDto updateNewsFeed(Long userId, Long feedsId, NewsFeedRequestDto requestDto){
+    public NewsFeedDto updateNewsFeed(Long userId, Long feedsId, NewsFeedRequestDto requestDto){
 
         //유저찾기
         UserEntity findUser = userRepository.findById(userId)
@@ -61,7 +61,7 @@ public class NewsFeedService {
             throw new CustomException(ErrorCode.NEWSFEED_FORBIDDEN);
         }
         findNewsFeedEntity.update(requestDto);
-        return NewsFeedResponseDto.fromEntity(findNewsFeedEntity);
+        return NewsFeedDto.fromEntity(findNewsFeedEntity);
     }
 
     @Transactional

@@ -6,11 +6,10 @@ import lombok.Getter;
 import nbc.newsfeed.domain.entity.NewsFeedEntity;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Builder
-public class NewsFeedResponseDto {
+public class NewsFeedDto {
 
     private Long feedId;
     private Long userId;
@@ -21,8 +20,8 @@ public class NewsFeedResponseDto {
     private LocalDateTime updatedAt;
 
 
-    public static NewsFeedResponseDto fromEntity(NewsFeedEntity entity) {
-        return NewsFeedResponseDto.builder()
+    public static NewsFeedDto fromEntity(NewsFeedEntity entity) {
+        return NewsFeedDto.builder()
                 .feedId(entity.getId())
                 .userId(entity.getUser().getId())
                 .nickName(entity.getUser().getNickname())
