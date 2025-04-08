@@ -7,8 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedUseYn;
-import static nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedUseYn.Y;
+import nbc.newsfeed.domain.dto.newsfeed.NewsFeedRequestDto;
+import nbc.newsfeed.domain.dto.newsfeed.NewsFeedUseYn;
+import static nbc.newsfeed.domain.dto.newsfeed.NewsFeedUseYn.Y;
 import nbc.newsfeed.domain.repository.newsfeedLike.NewsFeedLikeRepository;
 
 import java.util.Optional;
@@ -54,5 +55,10 @@ public class NewsFeedEntity extends TimeBaseEntity{
 
 	public void visibleNewsFeed(NewsFeedUseYn useYn) {
 		this.useYn = useYn;
+	}
+
+	public void update(NewsFeedRequestDto requestDto) {
+		this.title = requestDto.getTitle();
+		this.content = requestDto.getContent();
 	}
 }
