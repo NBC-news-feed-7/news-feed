@@ -53,8 +53,23 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+// Q 파일 생성 위치 지정
+def generated = layout.buildDirectory.dir("generated/querydsl").get().asFile
+
+sourceSets {
+    main {
+        java {
+            srcDirs += [generated]
+        }
+    }
+}
 // Q 파일 자동 생성
 tasks.withType(JavaCompile).configureEach {
-    options.annotationProcessorGeneratedSourcesDirectory = file("build/generated/sources/annotationProcessor/java/main")
+    options.annotationProcessorGeneratedSourcesDirectory = file(generated)
 }
 
+tasks.register("compileQuerydsl", JavaCompile) {
+    source = sourceSets.main.java
+    classpath = configurations.annotationProcessor + sourceSets.main.compileClasspath
+    destinationDirectory.set(file(generated))
+}
