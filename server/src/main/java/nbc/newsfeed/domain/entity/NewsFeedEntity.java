@@ -46,19 +46,6 @@ public class NewsFeedEntity extends TimeBaseEntity{
 	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity user;
 
-	public void validateCanLike(UserEntity user, NewsFeedLikeRepository likeRepository) {
-		if (likeRepository.existsByNewsFeedAndUser(this, user)) {
-			throw new CustomException(ErrorCode.ALREADY_LIKED);
-		}
-	}
-
-	public void validateCanCancelLike(UserEntity user, NewsFeedLikeRepository likeRepository) {
-		if (!likeRepository.existsByNewsFeedAndUser(this, user)) {
-			throw new CustomException(ErrorCode.NOT_LIKED_YET);
-		}
-	}
-
-
 	public void visibleNewsFeed(NewsFeedUseYn useYn) {
 		this.useYn = useYn;
 	}
