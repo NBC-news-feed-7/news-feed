@@ -32,7 +32,9 @@ public enum ErrorCode {
 	// ✅ 친구 요청 관련 에러
 	REQUEST_NOT_FOUND("존재하지 않는 친구 요청입니다", HttpStatus.NOT_FOUND),
 	ALREADY_REQUESTED("이미 친구 요청을 보냈습니다", HttpStatus.CONFLICT),
-	INVALID_STATUS("유효하지 않은 친구 요청 상태입니다", HttpStatus.BAD_REQUEST);
+	INVALID_STATUS("유효하지 않은 친구 요청 상태입니다", HttpStatus.BAD_REQUEST),
+	ALREADY_FRIEND("이미 친구인 상태입니다", HttpStatus.CONFLICT),
+	INVALID_CANCEL("취소할 수 없는 친구 요청 상태입니다", HttpStatus.BAD_REQUEST);
 
 	private final String message;
 	private final HttpStatus status;
