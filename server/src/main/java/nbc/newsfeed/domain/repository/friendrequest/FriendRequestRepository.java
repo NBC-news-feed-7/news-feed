@@ -3,6 +3,8 @@ package nbc.newsfeed.domain.repository.friendrequest;
 import nbc.newsfeed.domain.entity.FriendRequestEntity;
 import nbc.newsfeed.domain.entity.UserEntity;
 import nbc.newsfeed.domain.dto.friendrequest.FriendRequestStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -26,4 +28,6 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequestEnti
     List<FriendRequestEntity> findAllByToUserAndStatus(UserEntity toUser, FriendRequestStatus status);
 
     boolean existsByFromUserIdAndToUserIdAndStatus(Long fromUserId, Long toUserId, FriendRequestStatus friendRequestStatus);
+
+    Page<FriendRequestEntity> findAllByStatus(FriendRequestStatus status, Pageable pageable);
 }

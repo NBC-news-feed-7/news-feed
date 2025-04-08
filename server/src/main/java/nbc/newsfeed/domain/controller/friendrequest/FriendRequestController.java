@@ -2,9 +2,12 @@ package nbc.newsfeed.domain.controller.friendrequest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import nbc.newsfeed.domain.dto.friendrequest.FriendRequestStatus;
 import nbc.newsfeed.domain.dto.friendrequest.request.FriendRequestRequestDto;
 import nbc.newsfeed.domain.dto.friendrequest.response.FriendRequestResponseDto;
+import nbc.newsfeed.domain.dto.friendrequest.response.FriendRequestPageResponseDto;
 import nbc.newsfeed.domain.service.friendrequest.FriendRequestService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
@@ -94,5 +97,20 @@ public class FriendRequestController {
     public ResponseEntity<Void> deleteFriend(@PathVariable Long friendRequestId) {
         friendRequestService.deleteFriend(friendRequestId);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * ✅ 모든 친구 요청을 페이징 처리하여 조회합니다.
+     *
+     * @param status   필터링할 상태 값 (선택적)
+     * @param pageable 페이지, 크기, 정렬 기준 등
+     * @return 페이징된 친구 요청 목록
+     */
+    @GetMapping("/all")
+    public ResponseEntity<FriendRequestPageResponseDto<FriendRequestResponseDto>> getAllFriendRequests(
+            @RequestParam(required = false) FriendRequestStatus status,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(friendRequestService.getAllFriendRequestsPaged(status, pageable));
     }
 }
