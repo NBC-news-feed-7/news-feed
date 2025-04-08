@@ -1,4 +1,4 @@
-package nbc.newsfeed.domain.dto.friendrequest;
+package nbc.newsfeed.domain.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

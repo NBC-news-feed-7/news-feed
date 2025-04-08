@@ -7,13 +7,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import nbc.newsfeed.domain.dto.friendrequest.FriendRequestStatus;
 
 @ToString
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 때문에 무조건 있어야함
 @Table(name = "friend_requests")
 @Entity
 public class FriendRequestEntity extends TimeBaseEntity {
@@ -32,8 +31,4 @@ public class FriendRequestEntity extends TimeBaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private FriendRequestStatus status;
-
-	public void updateStatus(FriendRequestStatus status) {
-		this.status = status;
-	}
 }
