@@ -10,6 +10,8 @@ import nbc.newsfeed.domain.dto.newsfeeddto.NewsFeedSortType;
 import nbc.newsfeed.domain.entity.NewsFeedEntity;
 import nbc.newsfeed.domain.entity.UserEntity;
 import nbc.newsfeed.domain.repository.newsfeed.NewsFeedRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,8 +79,8 @@ public class NewsFeedService {
     }
 
     @Transactional(readOnly = true)
-    public List<NewsFeedResponseDto> getFeedsBySort(NewsFeedSortType sortType) {
-        return newsFeedRepository.findFeedsWithSort(sortType);
+    public Page<NewsFeedResponseDto> getFeedsBySort(NewsFeedSortType sortType, Pageable pageable) {
+        return newsFeedRepository.findFeedsWithSort(sortType, pageable);
     }
 
 }
