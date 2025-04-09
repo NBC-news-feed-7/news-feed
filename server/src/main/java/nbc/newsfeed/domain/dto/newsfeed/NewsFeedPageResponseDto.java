@@ -1,13 +1,13 @@
 package nbc.newsfeed.domain.dto.newsfeed;
 
-import lombok.Builder;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
-import nbc.newsfeed.domain.entity.NewsFeedEntity;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
+@NoArgsConstructor
 public class NewsFeedPageResponseDto {
     private Long feedId;
     private Long userId;
@@ -15,16 +15,21 @@ public class NewsFeedPageResponseDto {
     private String title;
     private String content;
     private LocalDateTime updatedAt;
+    private Long likeCount;
+    private Long commentCount;
 
-
-    public static NewsFeedPageResponseDto ofPageResponse(NewsFeedEntity entity) {
-        return NewsFeedPageResponseDto.builder()
-                .feedId(entity.getId())
-                .userId(entity.getUser().getId())
-                .nickName(entity.getUser().getNickname())
-                .title(entity.getTitle())
-                .content(entity.getContent())
-                .updatedAt(entity.getUpdatedAt())
-                .build();
+    @QueryProjection
+    public NewsFeedPageResponseDto(Long feedId, Long userId, String nickName,
+                                   String title, String content,
+                                   LocalDateTime updatedAt,
+                                   Long likeCount, Long commentCount) {
+        this.feedId = feedId;
+        this.userId = userId;
+        this.nickName = nickName;
+        this.title = title;
+        this.content = content;
+        this.updatedAt = updatedAt;
+        this.likeCount = likeCount;
+        this.commentCount = commentCount;
     }
 }

@@ -83,8 +83,8 @@ public class NewsFeedService {
     }
 
     @Transactional(readOnly = true)
-    public Page<NewsFeedPageResponseDto> getFeedsBySort(NewsFeedSortType sortType, Pageable pageable) {
-        return newsFeedRepository.findFeedsWithSort(sortType, pageable);
+    public Page<NewsFeedPageResponseDto> getFeedsByKeyword(String keyword, NewsFeedSortType sortType, Pageable pageable) {
+        return newsFeedRepository.searchFeeds(keyword, sortType, pageable);
     }
 
 }
