@@ -28,6 +28,9 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
         QCommentEntity comment = QCommentEntity.commentEntity;
 
         BooleanBuilder where = new BooleanBuilder();
+        // deleteAt 추가
+        where.and(news.deletedAt.isNull());
+
         if (keyword != null && !keyword.isBlank()) {
             where.and(news.title.containsIgnoreCase(keyword)
                     .or(news.content.containsIgnoreCase(keyword)));
