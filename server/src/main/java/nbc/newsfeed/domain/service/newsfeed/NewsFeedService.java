@@ -13,6 +13,7 @@ import nbc.newsfeed.domain.entity.NewsFileEntity;
 import nbc.newsfeed.domain.entity.UserEntity;
 import nbc.newsfeed.domain.repository.newsfeed.NewsFeedRepository;
 import nbc.newsfeed.domain.repository.newsfile.NewsFileRepository;
+import nbc.newsfeed.domain.repository.friendrequest.FriendRequestRepository;
 import nbc.newsfeed.domain.repository.user.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,7 @@ public class NewsFeedService {
     private final NewsFeedRepository newsFeedRepository;
     private final UserRepository userRepository;
     private final NewsFileRepository newsFileRepository;
+    private final FriendRequestRepository friendRequestRepository;
 
     @Transactional(readOnly = true)
     public NewsFeedDto getNewsFeed(Long feedsId) {
@@ -99,4 +101,12 @@ public class NewsFeedService {
         return newsFeedRepository.searchFeeds(keyword, sortType, pageable);
     }
 
+    @Transactional(readOnly = true)
+    public Page<NewsFeedPageResponseDto> getFriendFeeds(Long userId, NewsFeedSortType sortType, Pageable pageable) {
+
+        // 친구 ID 목록 조회
+        List<Long> friendIds = friendRequestRepository.findAllFriendIds(userId);
+
+        return newsFeedRepository.searchFriendFeeds(friendIds, sortType, pageable);
+    }
 }
