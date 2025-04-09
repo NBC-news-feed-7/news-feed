@@ -50,14 +50,6 @@ public class CommentEntity extends TimeBaseEntity {
 	private Integer useYn = 1;
 
 
-
-	public void toggleLike(UserEntity user, CommentLikeRepository likeRepository) {
-		Optional<CommentLikeEntity> existing = likeRepository.findByCommentAndUser(this, user);
-		existing.ifPresentOrElse(
-				likeRepository::delete,
-				() -> likeRepository.save(CommentLikeEntity.of(this, user))
-		);
-	}
 	public void updateContent(String content) {
 		this.content = content;
 	}

@@ -34,7 +34,12 @@ public enum ErrorCode {
 	ALREADY_REQUESTED("이미 친구 요청을 보냈습니다", HttpStatus.CONFLICT),
 	INVALID_STATUS("유효하지 않은 친구 요청 상태입니다", HttpStatus.BAD_REQUEST),
 	ALREADY_FRIEND("이미 친구인 상태입니다", HttpStatus.CONFLICT),
-	INVALID_CANCEL("취소할 수 없는 친구 요청 상태입니다", HttpStatus.BAD_REQUEST);
+	INVALID_CANCEL("취소할 수 없는 친구 요청 상태입니다", HttpStatus.BAD_REQUEST),
+
+	// ✅ 친구 요청 관련 에러
+	ALREADY_LIKED("이미 좋아요를 누르셨습니다.",HttpStatus.CONFLICT ),
+	LIKE_NOT_FOUND("좋아요 정보가 존재하지 않습니다.",HttpStatus.NOT_FOUND),
+	NOT_LIKED_YET("좋아요를 누르지 않았습니다.",HttpStatus.NOT_FOUND );
 
 	private final String message;
 	private final HttpStatus status;
