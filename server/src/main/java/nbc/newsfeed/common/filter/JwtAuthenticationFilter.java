@@ -1,77 +1,162 @@
 package nbc.newsfeed.common.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.micrometer.common.util.StringUtils;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import nbc.newsfeed.common.error.ErrorCode;
-import nbc.newsfeed.domain.service.auth.TokenService;
-import nbc.newsfeed.domain.service.auth.model.TokenClaim;
+import static nbc.newsfeed.common.util.AuthCookieUtil.*;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import nbc.newsfeed.common.error.CustomException;
+import nbc.newsfeed.common.error.ErrorCode;
+import nbc.newsfeed.common.error.ErrorResponseDto;
+import nbc.newsfeed.domain.entity.RefreshTokenEntity;
+import nbc.newsfeed.domain.repository.refreshtoken.RefreshTokenRepository;
+import nbc.newsfeed.domain.service.auth.TokenService;
+import nbc.newsfeed.domain.service.auth.model.Token;
+import nbc.newsfeed.domain.service.auth.model.TokenClaim;
 
 /**
  * @author : kimjungmin
- * Created on : 2025. 3. 24.
+ * Created on : 2025. 4. 9.
  */
+@Slf4j
+@Getter
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+	private final TokenService tokenService;
+	private final ObjectMapper objectMapper;
+	private final RefreshTokenRepository refreshTokenRepository;
 
-    private static final String AUTHENTICATION_HEADER = "Authorization";
-    private static final String JWT_TOKEN_PREFIX = "Bearer ";
-    private final TokenService tokenService;
-    private final ObjectMapper objectMapper;
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+		throws ServletException, IOException {
+		ParsedToken parsedToken = new ParsedToken(request.getCookies());
+		// 토큰이 둘 다 있어야 인증된 상태로 인정
+		if (parsedToken.isAccessTokenAndRefreshTokenExist()) {
+			try {
+				TokenClaim tokenClaim = tokenService.parseToken(parsedToken.getAccessToken());
+				makeSecurityAuthentication(tokenClaim);
+			} catch (ExpiredJwtException e) {
+				// 쿠키를 보낼 때는 만료가 아니었으나 도착 했을 때 만료되었을 수 있다.
+				try {
+					refreshToken(response, parsedToken);
+				} catch (Exception ex) {
+					throw ex;
+				}
+			} catch (Exception e) {
+				processInvalidToken(request, response);
+				return;
+			}
+		}
 
-    public JwtAuthenticationFilter(TokenService tokenService, ObjectMapper objectMapper) {
-        this.tokenService = tokenService;
-        this.objectMapper = objectMapper;
-    }
+		// 액세스 토큰이 만료되면 요청에 쿠키가 없다.
+		if (parsedToken.isAccessTokenNotExistsAndRefreshTokenExists()) {
+			try {
+				refreshToken(response, parsedToken);
+			} catch (Exception e) {
+				processInvalidToken(request, response);
+				return;
+			}
+		}
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-        String authorizationHeader = request.getHeader(AUTHENTICATION_HEADER);
-        if (StringUtils.isNotBlank(authorizationHeader) && authorizationHeader.startsWith(JWT_TOKEN_PREFIX)) {
-            String accessToken = authorizationHeader.substring(7);
-            try {
-                TokenClaim tokenClaim = tokenService.parseToken(accessToken);
-                List<SimpleGrantedAuthority> authorities = tokenClaim.getRoles()
-                        .stream()
-                        .map(SimpleGrantedAuthority::new)
-                        .toList();
-                // TODO 인증에 유저 아이디 들어 있음 공유 필요
-                Authentication authentication = new TestingAuthenticationToken(
-                        tokenClaim.getSubject(), "password", authorities
-                );
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (ExpiredJwtException e) {
-                // 토큰 만료되었을 경우
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+		filterChain.doFilter(request, response);
+	}
 
-                response.getWriter()
-                        .write(objectMapper.writeValueAsString(
-                                ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                                        .body(Map.of("message", ErrorCode.AUTH_TOKEN_EXPIRED.getMessage())))
-                        );
-                return;
-            }
-        }
+	// 응답값이 true이면 response를 통해 예외를 내보냈다는 거라서 필터체인을 더 진행 시키면 안된다.
+	private void refreshToken(
+		HttpServletResponse response,
+		ParsedToken parsedToken) {
 
-        filterChain.doFilter(request, response);
-    }
+		refreshTokenRepository.findByRefreshToken(parsedToken.getRefreshToken())
+			.orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
+
+		TokenClaim tokenClaim = tokenService.parseToken(parsedToken.getRefreshToken());
+		makeSecurityAuthentication(tokenClaim);
+
+		Token newToken = tokenService.generateToken(tokenClaim);
+		refreshTokenRepository.save(RefreshTokenEntity.of(newToken));
+
+		addAuthCookies(response, newToken);
+	}
+
+	private void processInvalidToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		response.setStatus(HttpStatus.UNAUTHORIZED.value());
+		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+		response.getWriter()
+			.write(objectMapper.writeValueAsString(
+				ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(ErrorResponseDto.from(ErrorCode.INVALID_TOKEN, request.getRequestURI())))
+			);
+	}
+
+	private void makeSecurityAuthentication(TokenClaim tokenClaim) {
+		List<SimpleGrantedAuthority> authorities = tokenClaim.getRoles()
+			.stream()
+			.map(SimpleGrantedAuthority::new)
+			.toList();
+
+		Authentication authentication = new UsernamePasswordAuthenticationToken(
+			tokenClaim.getSubject(), null, authorities
+		);
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+	}
+
+	@Getter
+	private static class ParsedToken {
+		private final String accessToken;
+		private final String refreshToken;
+
+		public ParsedToken(Cookie[] cookies) {
+			String accessToken = null;
+			String refreshToken = null;
+
+			if (cookies != null) {
+				for (Cookie cookie : cookies) {
+					if (cookie.getName().equals(ACCESS_TOKEN_COOKIE)) {
+						accessToken = cookie.getValue();
+						continue;
+					}
+
+					if (cookie.getName().equals(REFRESH_TOKEN_COOKIE)) {
+						refreshToken = cookie.getValue();
+					}
+				}
+			}
+
+			this.accessToken = accessToken;
+			this.refreshToken = refreshToken;
+		}
+
+		public boolean isAccessTokenAndRefreshTokenExist() {
+			return accessToken != null && refreshToken != null;
+		}
+
+		public boolean isAccessTokenNotExistsAndRefreshTokenExists() {
+			return accessToken == null && refreshToken != null;
+		}
+	}
 }
+
+

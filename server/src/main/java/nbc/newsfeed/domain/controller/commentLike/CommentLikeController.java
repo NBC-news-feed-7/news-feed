@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,6 +35,15 @@ public class CommentLikeController {
         Long userId = Long.parseLong(authentication.getName());
         commentLikeService.removeLike(commentId, userId);
         return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/{commentId}/likes/me")
+    public ResponseEntity<Map<String, Boolean>> hasLiked(
+            @PathVariable Long commentId,
+            Authentication authentication
+    ) {
+        Long userId = Long.parseLong(authentication.getName());
+        boolean liked = commentLikeService.hasUserLikedFeed(commentId, userId);
+        return ResponseEntity.ok(Collections.singletonMap("liked", liked));
     }
 
 

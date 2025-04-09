@@ -9,6 +9,7 @@ import nbc.newsfeed.domain.dto.newsfeed.NewsFeedSortType;
 import nbc.newsfeed.domain.entity.QCommentEntity;
 import nbc.newsfeed.domain.entity.QNewsFeedEntity;
 import nbc.newsfeed.domain.entity.QNewsFeedLikeEntity;
+import nbc.newsfeed.domain.entity.QNewsFileEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,7 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
         QNewsFeedEntity news = QNewsFeedEntity.newsFeedEntity;
         QNewsFeedLikeEntity like = QNewsFeedLikeEntity.newsFeedLikeEntity;
         QCommentEntity comment = QCommentEntity.commentEntity;
+        QNewsFileEntity file = QNewsFileEntity.newsFileEntity;
 
         BooleanBuilder where = new BooleanBuilder();
         // deleteAt 추가
@@ -46,11 +48,13 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
                         news.content,
                         news.updatedAt,
                         like.countDistinct(),
-                        comment.countDistinct()
+                        comment.countDistinct(),
+                        file.path.min()
                 ))
                 .from(news)
                 .leftJoin(like).on(like.newsFeed.eq(news))
                 .leftJoin(comment).on(comment.newsFeed.eq(news))
+                .leftJoin(file).on(file.newsFeed.eq(news))
                 .where(where)
                 .groupBy(news.id)
                 .orderBy(sortType.getOrderBy(news, like))
