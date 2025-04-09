@@ -13,6 +13,7 @@ public enum ErrorCode {
 	AUTH_UNAUTHORIZED("인증이 필요한 요청입니다", HttpStatus.UNAUTHORIZED),
 	AUTH_TOKEN_EXPIRED("만료된 토큰입니다.", HttpStatus.UNAUTHORIZED),
 	FORBIDDEN("권한 없는 유저입니다.", HttpStatus.FORBIDDEN),
+  
 	// ✅ 유저 로직 관련 에러
 	USER_NOT_FOUND("존재하지 않는 사용자입니다", HttpStatus.UNAUTHORIZED),
 	PASSWORD_MISMATCH("비밀번호가 일치하지 않습니다", HttpStatus.UNAUTHORIZED),
@@ -36,7 +37,7 @@ public enum ErrorCode {
 	ALREADY_FRIEND("이미 친구인 상태입니다", HttpStatus.CONFLICT),
 	INVALID_CANCEL("취소할 수 없는 친구 요청 상태입니다", HttpStatus.BAD_REQUEST),
 
-	// ✅ 친구 요청 관련 에러
+	// ✅ 좋아요 요청 관련 에러
 	ALREADY_LIKED("이미 좋아요를 누르셨습니다.",HttpStatus.CONFLICT ),
 	LIKE_NOT_FOUND("좋아요 정보가 존재하지 않습니다.",HttpStatus.NOT_FOUND),
 	NOT_LIKED_YET("좋아요를 누르지 않았습니다.",HttpStatus.NOT_FOUND );
