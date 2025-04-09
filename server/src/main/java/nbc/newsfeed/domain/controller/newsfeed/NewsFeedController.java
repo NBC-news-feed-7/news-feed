@@ -4,7 +4,9 @@ package nbc.newsfeed.domain.controller.newsfeed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nbc.newsfeed.domain.dto.comment.response.CommentResponseDTO;
 import nbc.newsfeed.domain.dto.newsfeed.*;
+import nbc.newsfeed.domain.service.comment.CommentService;
 import nbc.newsfeed.domain.service.newsfeed.NewsFeedService;
 import nbc.newsfeed.domain.service.newsfeedLike.NewsFeedLikeService;
 import nbc.newsfeed.domain.dto.newsfeed.NewsFeedSortType;
@@ -15,6 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/feeds")
@@ -23,6 +28,7 @@ public class NewsFeedController {
 
     private final NewsFeedService newsFeedService;
     private final NewsFeedLikeService newsFeedLikeService;
+    private final CommentService commentService;
 
     @GetMapping("/{feedsId}")
     public ResponseEntity<NewsFeedDetailResponseDto> getNewsFeed(
@@ -31,7 +37,8 @@ public class NewsFeedController {
     ) {
         NewsFeedDto newsFeedDto = newsFeedService.getNewsFeed(feedsId);
         int likeCount = newsFeedLikeService.getLikeCount(feedsId);
-        NewsFeedDetailResponseDto responseDto = NewsFeedDetailResponseDto.fromDto(newsFeedDto, likeCount);
+        List<CommentResponseDTO> commentResponseDTOList = commentService.getCommentsByNewsFeedId(feedsId);
+        NewsFeedDetailResponseDto responseDto = NewsFeedDetailResponseDto.fromDto(newsFeedDto, likeCount, commentResponseDTOList);
         return ResponseEntity.ok(responseDto);
     }
 
