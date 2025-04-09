@@ -2,7 +2,6 @@ package nbc.newsfeed.common.config;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +26,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import nbc.newsfeed.common.error.ErrorCode;
+import nbc.newsfeed.common.error.ErrorResponseDto;
 import nbc.newsfeed.common.filter.JwtAuthenticationFilter;
+import nbc.newsfeed.domain.repository.refreshtoken.RefreshTokenRepository;
 import nbc.newsfeed.domain.service.auth.TokenService;
 
 @Configuration
@@ -40,6 +42,7 @@ public class SecurityConfig {
 
 	private final TokenService tokenService;
 	private final ObjectMapper objectMapper;
+	private final RefreshTokenRepository refreshTokenRepository;
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -51,14 +54,13 @@ public class SecurityConfig {
 		);
 		http.formLogin(AbstractHttpConfigurer::disable);
 
-		http.addFilterBefore(new JwtAuthenticationFilter(tokenService, objectMapper),
+		http.addFilterBefore(new JwtAuthenticationFilter(tokenService, objectMapper, refreshTokenRepository),
 			UsernamePasswordAuthenticationFilter.class);
 		// TODO 경로 수정
 		http.authorizeHttpRequests(authorize -> authorize
 			.requestMatchers(AUTH_ALLOWLIST).permitAll()
 			.requestMatchers(HttpMethod.POST, "/api/users").permitAll()
 			.requestMatchers(HttpMethod.POST, "/api/auth/token").permitAll()
-			.requestMatchers(HttpMethod.POST, "/api/auth/token/refresh").permitAll()
 			.anyRequest().authenticated()
 		);
 
@@ -79,8 +81,8 @@ public class SecurityConfig {
 			response.setStatus(HttpStatus.UNAUTHORIZED.value());
 			response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-			ResponseEntity<Map<String, String>> error = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-				.body(Map.of("message", authException.getMessage()));
+			ResponseEntity<ErrorResponseDto> error = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.body(ErrorResponseDto.from(ErrorCode.AUTH_UNAUTHORIZED, request.getRequestURI()));
 
 			response.getWriter().write(objectMapper.writeValueAsString(error));
 		};
@@ -92,8 +94,8 @@ public class SecurityConfig {
 			response.setStatus(HttpStatus.FORBIDDEN.value());
 			response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-			ResponseEntity<Map<String, String>> error = ResponseEntity.status(HttpStatus.FORBIDDEN)
-				.body(Map.of("message", accessDeniedException.getMessage()));
+			ResponseEntity<ErrorResponseDto> error = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.body(ErrorResponseDto.from(ErrorCode.FORBIDDEN, request.getRequestURI()));
 
 			response.getWriter().write(objectMapper.writeValueAsString(error));
 		};

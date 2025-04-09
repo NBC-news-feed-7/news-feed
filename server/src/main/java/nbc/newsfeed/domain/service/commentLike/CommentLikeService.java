@@ -55,5 +55,8 @@ public class CommentLikeService {
         return commentLikeRepository.findLikeUsersByCommentId(commentId);
     }
 
+    public boolean hasUserLikedFeed(Long commentId, Long userId) {
+        return commentLikeRepository.existsByCommentIdAndUserId(commentId, userId);
+    }
 }
 
