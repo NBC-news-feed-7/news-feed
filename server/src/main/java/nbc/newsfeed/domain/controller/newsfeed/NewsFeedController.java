@@ -89,4 +89,15 @@ public class NewsFeedController {
         Page<NewsFeedPageResponseDto> feeds = newsFeedService.getFeedsByKeyword(keyword, sortType, pageable);
         return ResponseEntity.ok(feeds);
     }
+
+    @GetMapping("/friends")
+    public ResponseEntity<Page<NewsFeedPageResponseDto>> getFriendFeeds(
+            @RequestParam(defaultValue = "LATEST") NewsFeedSortType sortType,
+            Pageable pageable,
+            Authentication authentication
+    ) {
+        Long userId = Long.parseLong(authentication.getName());
+        Page<NewsFeedPageResponseDto> feeds = newsFeedService.getFriendFeeds(userId, sortType, pageable);
+        return ResponseEntity.ok(feeds);
+    }
 }

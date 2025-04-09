@@ -64,4 +64,48 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
         return new PageImpl<>(content, pageable, total);
     }
 
+    @Override
+    public Page<NewsFeedPageResponseDto> searchFriendFeeds(List<Long> friendIds, NewsFeedSortType sortType, Pageable pageable) {
+        if (friendIds.isEmpty()) return Page.empty(pageable);
+
+        QNewsFeedEntity news = QNewsFeedEntity.newsFeedEntity;
+        QNewsFeedLikeEntity like = new QNewsFeedLikeEntity("like");
+        QCommentEntity comment = new QCommentEntity("comment");
+
+        BooleanBuilder where = new BooleanBuilder();
+        where.and(news.user.id.in(friendIds));
+        where.and(news.deletedAt.isNull());
+
+        List<NewsFeedPageResponseDto> content = queryFactory
+                .select(Projections.constructor(
+                        NewsFeedPageResponseDto.class,
+                        news.id,
+                        news.user.id,
+                        news.user.nickname,
+                        news.title,
+                        news.content,
+                        news.updatedAt,
+                        like.countDistinct(),
+                        comment.countDistinct()
+                ))
+                .from(news)
+                .leftJoin(like).on(like.newsFeed.eq(news))
+                .leftJoin(comment).on(comment.newsFeed.eq(news))
+                .join(news.user).on(news.user.deletedAt.isNull())
+                .where(where)
+                .groupBy(news.id)
+                .orderBy(sortType.getOrderBy(news, like))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long total = queryFactory
+                .select(news.count())
+                .from(news)
+                .where(where)
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total);
+    }
+
 }
