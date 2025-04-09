@@ -1,7 +1,5 @@
 package nbc.newsfeed.domain.service.auth;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,31 +35,9 @@ public class AuthService {
 
 		TokenClaim tokenClaim = new TokenClaim(user.getId(), user.getEmail(), user.getNickname(), List.of());
 		Token token = tokenService.generateToken(tokenClaim);
-		LocalDateTime expiredDateTime = token.getRefreshTokenExpiredAt().toInstant()
-			.atZone(ZoneId.systemDefault())
-			.toLocalDateTime();
 
-		RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.of(token.getRefreshToken(), expiredDateTime);
-		refreshTokenRepository.save(refreshTokenEntity);
-
-		return token;
-	}
-
-	@Transactional
-	public Token refreshToken(final String refreshToken) {
-		RefreshTokenEntity refreshTokenEntity = refreshTokenRepository.findByRefreshToken(refreshToken)
-			.orElseThrow(() -> new CustomException(ErrorCode.AUTH_TOKEN_EXPIRED));
-
-		TokenClaim tokenClaim = tokenService.parseToken(refreshTokenEntity.getRefreshToken());
-		Token token = tokenService.generateToken(tokenClaim);
-		LocalDateTime expiredDateTime = token.getRefreshTokenExpiredAt().toInstant()
-			.atZone(ZoneId.systemDefault())
-			.toLocalDateTime();
-
-		refreshTokenRepository.deleteByRefreshToken(refreshToken);
-
-		RefreshTokenEntity newRefreshTokenEntity = RefreshTokenEntity.of(token.getRefreshToken(), expiredDateTime);
-		refreshTokenRepository.save(newRefreshTokenEntity);
+		//  아 이게 드물게 겹치는 토큰이 생기긴하네 ;
+		refreshTokenRepository.save(RefreshTokenEntity.of(token));
 
 		return token;
 	}
