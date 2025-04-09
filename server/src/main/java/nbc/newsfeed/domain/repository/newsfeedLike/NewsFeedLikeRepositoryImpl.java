@@ -34,6 +34,7 @@ public class NewsFeedLikeRepositoryImpl implements NewsFeedLikeRepositoryCustom 
     @Override
     public Page<NewsFeedPageResponseDto> findLikedFeedsByUserId(Long userId, Pageable pageable) {
         QNewsFeedLikeEntity like = QNewsFeedLikeEntity.newsFeedLikeEntity;
+        QUserEntity user = QUserEntity.userEntity;
         QNewsFeedEntity news = QNewsFeedEntity.newsFeedEntity;
         QCommentEntity comment = QCommentEntity.commentEntity;
         QNewsFileEntity file = QNewsFileEntity.newsFileEntity;
@@ -53,9 +54,9 @@ public class NewsFeedLikeRepositoryImpl implements NewsFeedLikeRepositoryCustom 
                 ))
                 .from(like)
                 .join(like.newsFeed, news)
+                .join(news.user, user)
                 .leftJoin(comment).on(comment.newsFeed.eq(news))
                 .leftJoin(file).on(file.newsFeed.eq(news))
-
                 .where(like.user.id.eq(userId))
                 .groupBy(news.id)
                 .orderBy(news.updatedAt.desc())
