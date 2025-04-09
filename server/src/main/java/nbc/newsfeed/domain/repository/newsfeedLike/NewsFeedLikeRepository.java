@@ -27,4 +27,7 @@ public interface NewsFeedLikeRepository extends JpaRepository<NewsFeedLikeEntity
                 .orElseThrow(() -> new CustomException(ErrorCode.LIKE_NOT_FOUND));
     }
 
+    boolean existsByNewsFeedIdAndUserId(Long newsFeedId, Long userId);
+
+    Long user(UserEntity user);
 }
