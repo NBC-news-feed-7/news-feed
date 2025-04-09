@@ -13,7 +13,9 @@ import lombok.*;
         name = "news_feed_likes",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"news_feeds_id", "user_id"})
-        }
+        }, indexes = {
+                @Index(name = "idx_like_user_feed", columnList = "user_id, news_feed_id")
+}
 )
 @Entity
 public class NewsFeedLikeEntity extends TimeBaseEntity {

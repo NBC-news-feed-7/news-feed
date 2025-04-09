@@ -16,6 +16,8 @@ public interface CommentLikeRepository extends JpaRepository<CommentLikeEntity, 
 
     boolean existsByCommentAndUser(CommentEntity commentEntity, UserEntity user);
 
+    boolean existsByCommentIdAndUserId(Long commentId, Long userId);
+
     default void validateNotAlreadyLiked(CommentEntity commentEntity, UserEntity user) {
         if (existsByCommentAndUser(commentEntity, user)) {
             throw new CustomException(ErrorCode.ALREADY_LIKED);
