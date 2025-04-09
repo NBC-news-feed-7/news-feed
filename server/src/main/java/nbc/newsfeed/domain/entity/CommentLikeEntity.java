@@ -9,10 +9,8 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "comments_likes", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"comment_id", "user_id"})
-    }, indexes = {
-        @Index(name = "idx_like_comment_user", columnList = "user_id")
-    }
+        @UniqueConstraint(columnNames = {"comment_id", "user_id"})}, indexes = {
+        @Index(name = "idx_like_comment_user", columnList = "user_id")}
 )
 @Entity
 public class CommentLikeEntity extends TimeBaseEntity {
