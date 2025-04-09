@@ -17,9 +17,7 @@ import java.util.Optional;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "comments", indexes = {
-		@Index(name = "idx_comment_feed", columnList = "news_feed_id")
-})
+@Table(name = "comments")
 @Entity
 public class CommentEntity extends TimeBaseEntity {
 	@Id
