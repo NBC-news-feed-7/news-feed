@@ -14,6 +14,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import nbc.newsfeed.domain.repository.commentLike.CommentLikeRepository;
+
+import java.util.Optional;
 
 
 @ToString
@@ -42,6 +45,17 @@ public class CommentEntity extends TimeBaseEntity {
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity user;
+	@Column(nullable = false, columnDefinition = "INT DEFAULT 1")
+	@Builder.Default
+	private Integer useYn = 1;
 
-	private Integer useYn;
+
+	public void updateContent(String content) {
+		this.content = content;
+	}
+	public void delete() {
+		this.useYn = 0;
+	}
+
+
 }

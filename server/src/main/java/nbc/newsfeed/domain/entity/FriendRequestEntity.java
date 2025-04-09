@@ -1,24 +1,19 @@
 package nbc.newsfeed.domain.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import nbc.newsfeed.domain.dto.friendrequest.FriendRequestStatus;
 
 @ToString
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 때문에 무조건 있어야함
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "friend_requests")
 @Entity
 public class FriendRequestEntity extends TimeBaseEntity {
@@ -34,5 +29,11 @@ public class FriendRequestEntity extends TimeBaseEntity {
 	@JoinColumn(name = "to_user_id", nullable = false)
 	private UserEntity toUser;
 
-	// TODO 상태 추가 예정
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private FriendRequestStatus status;
+
+	public void updateStatus(FriendRequestStatus status) {
+		this.status = status;
+	}
 }
