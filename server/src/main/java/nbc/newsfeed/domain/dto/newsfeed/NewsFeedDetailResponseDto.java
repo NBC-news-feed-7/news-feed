@@ -12,10 +12,12 @@ public class NewsFeedDetailResponseDto {
     private NewsFeedDto newsFeedDto;
     private Long likeCount;
     private List<CommentResponseDTO> commentDtoList;
+    private List<String> pathList;
 
-    public static NewsFeedDetailResponseDto fromDto(NewsFeedDto newsFeedDto, int likeCount, List<CommentResponseDTO> listDto){
+    public static NewsFeedDetailResponseDto fromDto(NewsFeedDto newsFeedDto, int likeCount, List<CommentResponseDTO> listDto, List<String> pathList){
         return NewsFeedDetailResponseDto.builder()
                 .newsFeedDto(newsFeedDto)
+                .pathList(pathList)
                 .commentDtoList(listDto)
                 .likeCount((long)likeCount).build();
     }

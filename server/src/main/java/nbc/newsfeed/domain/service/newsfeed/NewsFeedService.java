@@ -9,13 +9,17 @@ import nbc.newsfeed.domain.dto.newsfeed.NewsFeedPageResponseDto;
 import nbc.newsfeed.domain.dto.newsfeed.NewsFeedRequestDto;
 import nbc.newsfeed.domain.dto.newsfeed.NewsFeedSortType;
 import nbc.newsfeed.domain.entity.NewsFeedEntity;
+import nbc.newsfeed.domain.entity.NewsFileEntity;
 import nbc.newsfeed.domain.entity.UserEntity;
 import nbc.newsfeed.domain.repository.newsfeed.NewsFeedRepository;
+import nbc.newsfeed.domain.repository.newsfile.NewsFileRepository;
 import nbc.newsfeed.domain.repository.user.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -24,15 +28,22 @@ public class NewsFeedService {
 
     private final NewsFeedRepository newsFeedRepository;
     private final UserRepository userRepository;
+    private final NewsFileRepository newsFileRepository;
 
     @Transactional(readOnly = true)
     public NewsFeedDto getNewsFeed(Long feedsId) {
 
         NewsFeedEntity newsFeedEntity = newsFeedRepository.findById(feedsId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
-        //comment, newsfeedLike 수 가져오기 해야댐
 
         return NewsFeedDto.fromEntity(newsFeedEntity);
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> getNewsFeedImagesPaths(Long feedsID){
+        return newsFileRepository.findAllByNewsFeed_Id(feedsID)
+                .stream().map(NewsFileEntity::getPath)
+                .toList();
     }
 
     @Transactional
@@ -79,7 +90,8 @@ public class NewsFeedService {
         if (!findNewsFeed.getUser().getId().equals(userId)) {
             throw new CustomException(ErrorCode.NEWSFEED_FORBIDDEN);
         }
-        newsFeedRepository.delete(findNewsFeed);
+        findNewsFeed.sofeDelete();
+        //newsFeedRepository.delete(findNewsFeed);
     }
 
     @Transactional(readOnly = true)
