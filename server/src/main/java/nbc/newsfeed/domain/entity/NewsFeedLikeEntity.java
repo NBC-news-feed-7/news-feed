@@ -14,7 +14,7 @@ import lombok.*;
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"news_feeds_id", "user_id"})
         }, indexes = {
-                @Index(name = "idx_like_user_feed", columnList = "user_id, news_feed_id")
+                @Index(name = "idx_like_user_feed", columnList = "user_id, news_feeds_id")
 }
 )
 @Entity
