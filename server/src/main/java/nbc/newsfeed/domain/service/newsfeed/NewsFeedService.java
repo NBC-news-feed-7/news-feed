@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -97,8 +98,8 @@ public class NewsFeedService {
     }
 
     @Transactional(readOnly = true)
-    public Page<NewsFeedPageResponseDto> getFeedsByKeyword(String keyword, NewsFeedSortType sortType, Pageable pageable) {
-        return newsFeedRepository.searchFeeds(keyword, sortType, pageable);
+    public Page<NewsFeedPageResponseDto> getFeedsByKeyword(String keyword, LocalDate startDate, LocalDate endDate, NewsFeedSortType sortType, Pageable pageable) {
+        return newsFeedRepository.searchFeeds(keyword, startDate, endDate, sortType, pageable);
     }
 
     @Transactional(readOnly = true)
