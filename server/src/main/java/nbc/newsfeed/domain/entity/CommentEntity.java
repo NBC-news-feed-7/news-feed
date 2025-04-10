@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import nbc.newsfeed.common.error.CustomException;
 import nbc.newsfeed.common.error.ErrorCode;
-import nbc.newsfeed.domain.repository.commentLike.CommentLikeRepository;
 
-import java.util.Optional;
 
 
 @ToString
@@ -19,7 +17,15 @@ import java.util.Optional;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "comments")
+@Table(
+		name = "comments",
+		indexes = {
+				@Index(name = "idx_news_feed_id", columnList = "news_feed_id"),
+				@Index(name = "idx_user_id", columnList = "user_id"),
+				@Index(name = "idx_created_at", columnList = "created_at")
+		}
+)
+
 @Entity
 public class CommentEntity extends TimeBaseEntity {
 	@Id
