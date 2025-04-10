@@ -41,7 +41,9 @@ public enum ErrorCode {
 	// ✅ 좋아요 요청 관련 에러
 	ALREADY_LIKED("이미 좋아요를 누르셨습니다.", HttpStatus.CONFLICT),
 	LIKE_NOT_FOUND("좋아요 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
-	NOT_LIKED_YET("좋아요를 누르지 않았습니다.", HttpStatus.NOT_FOUND);
+	NOT_LIKED_YET("좋아요를 누르지 않았습니다.", HttpStatus.NOT_FOUND),
+	CANNOT_LIKE_OWN_POST("자신이 작성한 게시글에는 좋아요를 누를 수 없습니다.",HttpStatus.BAD_REQUEST ),
+	CANNOT_LIKE_OWN_COMMENT("자신이 작성한 댓글에는 좋아요를 누를 수 없습니다.",HttpStatus.BAD_REQUEST);
 
 	private final String message;
 	private final HttpStatus status;

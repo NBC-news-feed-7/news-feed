@@ -58,4 +58,15 @@ public class NewsFeedEntity extends TimeBaseEntity{
 		this.title = requestDto.getTitle();
 		this.content = requestDto.getContent();
 	}
+  
+	public void sofeDelete(){
+		this.deletedAt = LocalDateTime.now();
+	}
+
+	public void validateNotAuthor(UserEntity liker) {
+		if (this.user.getId().equals(liker.getId())) {
+			throw new CustomException(ErrorCode.CANNOT_LIKE_OWN_POST);
+		}
+	}
+
 }

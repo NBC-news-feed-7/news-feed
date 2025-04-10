@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
 
 
     @Override
-    public Page<NewsFeedPageResponseDto> searchFeeds(String keyword, NewsFeedSortType sortType, Pageable pageable) {
+    public Page<NewsFeedPageResponseDto> searchFeeds(String keyword, LocalDate startDate, LocalDate endDate, NewsFeedSortType sortType, Pageable pageable) {
         QNewsFeedEntity news = QNewsFeedEntity.newsFeedEntity;
         QNewsFeedLikeEntity like = QNewsFeedLikeEntity.newsFeedLikeEntity;
         QCommentEntity comment = QCommentEntity.commentEntity;
@@ -36,6 +38,12 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
         if (keyword != null && !keyword.isBlank()) {
             where.and(news.title.containsIgnoreCase(keyword)
                     .or(news.content.containsIgnoreCase(keyword)));
+        }
+        if (startDate != null) {
+            where.and(news.createdAt.goe(startDate.atStartOfDay()));
+        }
+        if (endDate != null) {
+            where.and(news.createdAt.loe(endDate.atTime(LocalTime.MAX)));
         }
 
         List<NewsFeedPageResponseDto> content = queryFactory
