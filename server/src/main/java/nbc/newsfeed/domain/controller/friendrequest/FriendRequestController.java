@@ -101,8 +101,11 @@ public class FriendRequestController {
      * @return void
      */
     @DeleteMapping("/{friendRequestId}/remove")
-    public ResponseEntity<Void> deleteFriend(@PathVariable Long friendRequestId) {
-        friendRequestService.deleteFriend(friendRequestId);
+    public ResponseEntity<Void> deleteFriend(
+            @PathVariable Long friendRequestId,
+            Authentication authentication) {
+        Long currentUserId = Long.parseLong(authentication.getName());
+        friendRequestService.deleteFriend(friendRequestId, currentUserId);
         return ResponseEntity.noContent().build();
     }
 

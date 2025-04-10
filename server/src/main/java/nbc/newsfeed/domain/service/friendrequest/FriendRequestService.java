@@ -145,9 +145,15 @@ public class FriendRequestService {
      * @param requestId 친구 요청 ID
      */
     @Transactional
-    public void deleteFriend(Long requestId) {
+    public void deleteFriend(Long requestId, Long currentUserId) {
         FriendRequestEntity request = friendRequestRepository.findById(requestId)
                 .orElseThrow(() -> new CustomException(ErrorCode.REQUEST_NOT_FOUND));
+
+        if (!request.getFromUser().getId().equals(currentUserId) &&
+                !request.getToUser().getId().equals(currentUserId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
         friendRequestRepository.delete(request);
     }
 
