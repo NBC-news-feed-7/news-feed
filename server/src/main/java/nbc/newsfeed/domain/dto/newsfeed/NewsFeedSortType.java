@@ -22,6 +22,12 @@ public enum NewsFeedSortType {
         public OrderSpecifier<?> getOrderBy(QNewsFeedEntity news, QNewsFeedLikeEntity like) {
             return like.count().desc();
         }
+    },
+    MOST_VIEW {
+        @Override
+        public OrderSpecifier<?> getOrderBy(QNewsFeedEntity news, QNewsFeedLikeEntity like) {
+            return news.viewCount.desc();
+        }
     };
 
     public abstract OrderSpecifier<?> getOrderBy(QNewsFeedEntity news, QNewsFeedLikeEntity like);

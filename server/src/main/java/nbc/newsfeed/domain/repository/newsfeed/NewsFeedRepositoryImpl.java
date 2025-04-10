@@ -57,7 +57,8 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
                         news.updatedAt,
                         like.countDistinct(),
                         comment.countDistinct(),
-                        file.path.min()
+                        file.path.min(),
+                        news.viewCount
                 ))
                 .from(news)
                 .leftJoin(like).on(like.newsFeed.eq(news))
@@ -103,7 +104,8 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
                         news.updatedAt,
                         like.countDistinct(),
                         comment.countDistinct(),
-                        file.path.min()
+                        file.path.min(),
+                        news.viewCount
                 ))
                 .from(news)
                 .leftJoin(like).on(like.newsFeed.eq(news))
