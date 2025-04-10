@@ -33,6 +33,11 @@ public class NewsFeedEntity extends TimeBaseEntity {
     @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false)
+    private Long viewCount;
+    public void increaseView(){
+        this.viewCount++;
+    }
 
     @Column(nullable = true)
     private LocalDateTime deletedAt;

@@ -40,7 +40,7 @@ public class NewsFeedController {
             @PathVariable Long feedsId,
             Authentication authentication
     ) {
-        NewsFeedDto newsFeedDto = newsFeedService.getNewsFeed(feedsId);
+        NewsFeedDto newsFeedDto = newsFeedService.getNewsFeedPessimistic(feedsId);
         int likeCount = newsFeedLikeService.getLikeCount(feedsId);
         List<CommentResponseDTO> commentResponseDTOList = commentService.getCommentsByNewsFeedId(feedsId);
         List<String> imagePaths = newsFeedService.getNewsFeedImagesPaths(feedsId); //응답엔티티에 넣어줘야함
