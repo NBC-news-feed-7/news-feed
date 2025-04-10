@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import nbc.newsfeed.common.error.CustomException;
+import nbc.newsfeed.common.error.ErrorCode;
 import nbc.newsfeed.domain.dto.newsfeed.NewsFeedRequestDto;
 import java.time.LocalDateTime;
 import org.hibernate.annotations.SQLRestriction;
@@ -53,4 +55,11 @@ public class NewsFeedEntity extends TimeBaseEntity{
 	public void sofeDelete(){
 		this.deletedAt = LocalDateTime.now();
 	}
+
+	public void validateNotAuthor(UserEntity liker) {
+		if (this.user.getId().equals(liker.getId())) {
+			throw new CustomException(ErrorCode.CANNOT_LIKE_OWN_POST);
+		}
+	}
+
 }
