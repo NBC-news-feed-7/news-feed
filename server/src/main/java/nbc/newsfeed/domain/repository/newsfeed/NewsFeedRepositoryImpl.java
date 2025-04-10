@@ -78,6 +78,7 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
         QNewsFeedEntity news = QNewsFeedEntity.newsFeedEntity;
         QNewsFeedLikeEntity like = new QNewsFeedLikeEntity("like");
         QCommentEntity comment = new QCommentEntity("comment");
+        QNewsFileEntity file = QNewsFileEntity.newsFileEntity;
 
         BooleanBuilder where = new BooleanBuilder();
         where.and(news.user.id.in(friendIds));
@@ -93,12 +94,13 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
                         news.content,
                         news.updatedAt,
                         like.countDistinct(),
-                        comment.countDistinct()
+                        comment.countDistinct(),
+                        file.path.min()
                 ))
                 .from(news)
                 .leftJoin(like).on(like.newsFeed.eq(news))
                 .leftJoin(comment).on(comment.newsFeed.eq(news))
-                .join(news.user).on(news.user.deletedAt.isNull())
+                .leftJoin(file).on(file.newsFeed.eq(news))
                 .where(where)
                 .groupBy(news.id)
                 .orderBy(sortType.getOrderBy(news, like))
