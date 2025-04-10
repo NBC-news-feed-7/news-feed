@@ -93,7 +93,7 @@ public class NewsFeedService {
         if (!findNewsFeed.getUser().getId().equals(userId)) {
             throw new CustomException(ErrorCode.NEWSFEED_FORBIDDEN);
         }
-        newsFeedRepository.delete(findNewsFeed);
+        findNewsFeed.sofeDelete();
     }
 
     @Transactional(readOnly = true)
