@@ -16,4 +16,9 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
         return findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
     }
+
+    Optional<List<CommentEntity>> findAllByNewsFeedAndUseYn(NewsFeedEntity newsFeed, int i);
+
+
+    Optional<CommentEntity> findByIdAndUseYn(Long parentCommentId, int i);
 }
