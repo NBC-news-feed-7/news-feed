@@ -5,6 +5,7 @@ import nbc.newsfeed.domain.entity.UserEntity;
 import nbc.newsfeed.domain.dto.friendrequest.FriendRequestStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,6 +21,7 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequestEnti
     boolean existsByFromUserIdAndToUserId(Long fromUserId, Long toUserId);
 
     // 특정 유저에게 온 친구 요청 조회
+    @EntityGraph(attributePaths = {"fromUser", "toUser"})
     List<FriendRequestEntity> findAllByToUserId(Long toUserId);
 
     // 친구 요청 단건 조회 (요청자, 수신자 기준)
