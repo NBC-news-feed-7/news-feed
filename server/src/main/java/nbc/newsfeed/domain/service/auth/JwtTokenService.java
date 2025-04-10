@@ -42,7 +42,7 @@ public class JwtTokenService implements TokenService {
 			.claim("email", tokenClaim.getEmail())
 			.claim("nickname", tokenClaim.getNickname())
 			.claim("roles", tokenClaim.getRoles())
-			.claim("jti", UUID.randomUUID().toString())
+			.claim("jti", UUID.randomUUID().toString())  // JWT 토큰이 겹칠 경우를 대비하기 위해 추가한 UUID
 			.issuedAt(issuedDate)
 			.expiration(accessTokenexpireDate)
 			.signWith(accessTokenSecretKey)
@@ -53,7 +53,7 @@ public class JwtTokenService implements TokenService {
 			.claim("email", tokenClaim.getEmail())
 			.claim("nickname", tokenClaim.getNickname())
 			.claim("roles", tokenClaim.getRoles())
-			.claim("jti", UUID.randomUUID().toString())
+			.claim("jti", UUID.randomUUID().toString()) // JWT 토큰이 겹칠 경우를 대비하기 위해 추가한 UUID
 			.issuedAt(issuedDate)
 			.expiration(refreshTokenexpireDate)
 			.signWith(refreshTokenSecretKey)

@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-@ConfigurationProperties(prefix = "jwt")
+@ConfigurationProperties(prefix = "jwt") // 객체에 바인딩 해서 사용하기 위함
 public class JwtConfig {
 
 	private final AccessToken accessToken;

@@ -47,6 +47,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final ObjectMapper objectMapper;
 	private final RefreshTokenRepository refreshTokenRepository;
 
+	// ParseToken JwtAuthenticationFilter 내부 클래스
+	// 요청에서 파싱된 AccessToken, RefreshToken을 표현하기 위한 클래스
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 		throws ServletException, IOException {
@@ -54,6 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		// 토큰이 둘 다 있어야 인증된 상태로 인정
 		if (parsedToken.isAccessTokenAndRefreshTokenExist()) {
 			try {
+				// TokenClaim(subejct:userId, email, nickname, roles)
 				TokenClaim tokenClaim = tokenService.parseToken(parsedToken.getAccessToken());
 				makeSecurityAuthentication(tokenClaim);
 			} catch (ExpiredJwtException e) {
@@ -82,23 +85,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		filterChain.doFilter(request, response);
 	}
 
-	// 응답값이 true이면 response를 통해 예외를 내보냈다는 거라서 필터체인을 더 진행 시키면 안된다.
+	// 토큰 재발급
 	private void refreshToken(
 		HttpServletResponse response,
 		ParsedToken parsedToken) {
-
+		// refreshToken이 유효한 토큰인지 확인 하기 위해 DB에서 토큰 확인
+		// 유효하지 않은 refreshToken은 DB에 존재하지 않음
 		refreshTokenRepository.findByRefreshToken(parsedToken.getRefreshToken())
 			.orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
-
+		// refreshToken 파싱 후 인증 객체 생성
 		TokenClaim tokenClaim = tokenService.parseToken(parsedToken.getRefreshToken());
 		makeSecurityAuthentication(tokenClaim);
-
+		// 새로운 토큰 기반으로 리프레시 토큰 재발급 DB에 남은 토큰은 스케줄러로 밀어버림
 		Token newToken = tokenService.generateToken(tokenClaim);
 		refreshTokenRepository.save(RefreshTokenEntity.of(newToken));
-
+		// 쿠키에 토큰 세팅
 		addAuthCookies(response, newToken);
 	}
 
+	// Token에 문제가 있을 경우 401예외 응답
 	private void processInvalidToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		response.setStatus(HttpStatus.UNAUTHORIZED.value());
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
@@ -111,6 +116,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			);
 	}
 
+	// Token정보를 기반으로 Security Authentication Setting
 	private void makeSecurityAuthentication(TokenClaim tokenClaim) {
 		List<SimpleGrantedAuthority> authorities = tokenClaim.getRoles()
 			.stream()
@@ -120,6 +126,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		Authentication authentication = new UsernamePasswordAuthenticationToken(
 			tokenClaim.getSubject(), null, authorities
 		);
+
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 	}
 
