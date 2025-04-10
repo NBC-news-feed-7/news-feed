@@ -24,6 +24,11 @@ import nbc.newsfeed.domain.service.auth.model.Token;
 public class AuthController {
 	private final AuthService authService;
 
+	/**
+	 * @see nbc.newsfeed.common.util.AuthCookieUtil addAuthCookies
+	 * @param request email, password
+	 * @return response accessToken, accessTokenIssuedAt, accessTokenExpiredAt, refreshToken refreshTokenIssuedAt, refreshTokenExpiredAt
+	 */
 	@PostMapping("/api/auth/token")
 	public ResponseEntity<TokenResponse> signin(
 		@Valid @RequestBody SigninRequest request,

@@ -12,6 +12,7 @@ public final class AuthCookieUtil {
 	public static final String ACCESS_TOKEN_COOKIE = "accessToken";
 	public static final String REFRESH_TOKEN_COOKIE = "refreshToken";
 
+	// 쿠키에 AccessToken, RefreshToken Setting
 	public static void addAuthCookies(HttpServletResponse response, Token token) {
 		Cookie accessTokenCookie = new Cookie(ACCESS_TOKEN_COOKIE, token.getAccessToken());
 		accessTokenCookie.setHttpOnly(true);
