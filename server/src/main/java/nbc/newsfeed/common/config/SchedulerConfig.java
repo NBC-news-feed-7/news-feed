@@ -8,6 +8,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * Created on : 2025. 4. 10.
  */
 @Configuration
-@EnableScheduling
+@EnableScheduling // MySQL에서 만료된 토큰을 지우기 위한 스케줄러 등록용
 public class SchedulerConfig {
 }

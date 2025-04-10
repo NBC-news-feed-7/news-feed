@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
  * @author    : kimjungmin
  * Created on : 2025. 4. 7.
  */
-@EnableJpaAuditing
+@EnableJpaAuditing // CreatedAt, UpdatedAt 기능 추가
 @Configuration
 public class JpaConfig {
 }

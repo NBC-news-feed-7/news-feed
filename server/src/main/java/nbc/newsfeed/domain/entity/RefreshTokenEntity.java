@@ -41,13 +41,6 @@ public class RefreshTokenEntity extends TimeBaseEntity {
 	@Column(nullable = false)
 	private LocalDateTime refreshTokenExpiredAt;
 
-	public static RefreshTokenEntity of(String refreshToken, LocalDateTime refreshTokenExpiredAt) {
-		return RefreshTokenEntity.builder()
-			.refreshToken(refreshToken)
-			.refreshTokenExpiredAt(refreshTokenExpiredAt)
-			.build();
-	}
-
 	public static RefreshTokenEntity of(Token token) {
 		LocalDateTime accessTokenExpireDateTime = token.getAccessTokenExpiredAt().toInstant()
 			.atZone(ZoneId.systemDefault())
