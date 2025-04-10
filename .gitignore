@@ -2,3 +2,6 @@
 compose.yaml
 
 uploads
+
+# 기본 회원 프로필
+uploads/

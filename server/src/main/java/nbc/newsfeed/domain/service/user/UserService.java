@@ -20,18 +20,31 @@ public class UserService {
 	private final PasswordEncoder passwordEncoder;
 	private final UserRepository userRepository;
 
+	/**
+	 * @param email
+	 * @param password
+	 * @param nickname
+	 * @return UserEntity(id, email, nickname, profileImageUrl, createdAt, updatedAt, deletedAt)
+	 */
 	@Transactional
 	public UserEntity register(final String email, final String password, final String nickname) {
 		if (userRepository.existsByEmail(email)) {
 			throw new CustomException(ErrorCode.DUPLICATED_EMAIL);
 		}
-
+		// 비밀번호 암호화
 		final String encryptedPassword = passwordEncoder.encode(password);
 		UserEntity user = UserEntity.withRegisterInfo(email, encryptedPassword, nickname);
 
 		return userRepository.save(user);
 	}
 
+	/**
+	 * @param userId
+	 * @param password 기존 비밀번호
+	 * @param updatedPassword 새로운 비밀번호
+	 * @param nickname
+	 * @return UserEntity(id, email, nickname, profileImageUrl, createdAt, updatedAt, deletedAt)
+	 */
 	@Transactional
 	public UserEntity update(
 		final Long userId,
@@ -56,22 +69,39 @@ public class UserService {
 		return user;
 	}
 
+	/**
+	 *
+	 * @param userId
+	 * @param newProfileImageUrl
+	 * @return UserEntity(id, email, nickname, newProfileImageUrl, createdAt, updatedAt, deletedAt)
+	 */
 	@Transactional
-	public UserEntity changeProfileImage(final Long userId, final String profileImageUrl) {
+	public UserEntity changeProfileImage(final Long userId, final String newProfileImageUrl) {
 		UserEntity user = userRepository.findById(userId)
 			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-		user.changeProfileImage(profileImageUrl);
+		user.changeProfileImage(newProfileImageUrl);
 
 		return user;
 	}
 
+	/**
+	 *
+	 * @param userId
+	 * @return UserEntity(id, email, nickname, profileImageUrl, createdAt, updatedAt, deletedAt)
+	 */
 	@Transactional(readOnly = true)
 	public UserEntity findById(final Long userId) {
 		return userRepository.findById(userId)
 			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 	}
 
+	/**
+	 *
+	 * @param userId
+	 * @param password
+	 * @return UserEntity(id, email, nickname, profileImageUrl, createdAt, updatedAt, deletedAt)
+	 */
 	@Transactional
 	public void deleteById(final Long userId, final String password) {
 		UserEntity user = userRepository.findById(userId)

@@ -1,7 +1,5 @@
 package nbc.newsfeed.domain.service.auth;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,42 +24,22 @@ public class AuthService {
 	private final PasswordEncoder passwordEncoder;
 	private final RefreshTokenRepository refreshTokenRepository;
 
+	// Token 생성
 	@Transactional
 	public Token generateToken(final String email, final String password) {
+		// 존재하는 유저인지 확인
 		UserEntity user = userRepository.findByEmail(email)
 			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
+		// 비밀번호 일치 여부 확인
 		if (!passwordEncoder.matches(password, user.getPassword())) {
 			throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
 		}
-
+		// 토큰 정보 생성 ID, Email, nickname, Roles -> 현재는 권한 관리 X
 		TokenClaim tokenClaim = new TokenClaim(user.getId(), user.getEmail(), user.getNickname(), List.of());
+		// Token(accessToken, refreshToken)
 		Token token = tokenService.generateToken(tokenClaim);
-		LocalDateTime expiredDateTime = token.getRefreshTokenExpiredAt().toInstant()
-			.atZone(ZoneId.systemDefault())
-			.toLocalDateTime();
-
-		RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.of(token.getRefreshToken(), expiredDateTime);
-		refreshTokenRepository.save(refreshTokenEntity);
-
-		return token;
-	}
-
-	@Transactional
-	public Token refreshToken(final String refreshToken) {
-		RefreshTokenEntity refreshTokenEntity = refreshTokenRepository.findByRefreshToken(refreshToken)
-			.orElseThrow(() -> new CustomException(ErrorCode.AUTH_TOKEN_EXPIRED));
-
-		TokenClaim tokenClaim = tokenService.parseToken(refreshTokenEntity.getRefreshToken());
-		Token token = tokenService.generateToken(tokenClaim);
-		LocalDateTime expiredDateTime = token.getRefreshTokenExpiredAt().toInstant()
-			.atZone(ZoneId.systemDefault())
-			.toLocalDateTime();
-
-		refreshTokenRepository.deleteByRefreshToken(refreshToken);
-
-		RefreshTokenEntity newRefreshTokenEntity = RefreshTokenEntity.of(token.getRefreshToken(), expiredDateTime);
-		refreshTokenRepository.save(newRefreshTokenEntity);
+		// refreshToken 저장
+		refreshTokenRepository.save(RefreshTokenEntity.of(token));
 
 		return token;
 	}

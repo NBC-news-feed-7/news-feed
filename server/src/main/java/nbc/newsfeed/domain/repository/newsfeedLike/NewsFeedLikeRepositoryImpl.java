@@ -5,10 +5,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import nbc.newsfeed.domain.dto.newsfeed.NewsFeedPageResponseDto;
 import nbc.newsfeed.domain.dto.newsfeedLike.LikeUserResponseDto;
-import nbc.newsfeed.domain.entity.QCommentEntity;
-import nbc.newsfeed.domain.entity.QNewsFeedEntity;
-import nbc.newsfeed.domain.entity.QNewsFeedLikeEntity;
-import nbc.newsfeed.domain.entity.QUserEntity;
+
+import nbc.newsfeed.domain.entity.*;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -37,8 +36,10 @@ public class NewsFeedLikeRepositoryImpl implements NewsFeedLikeRepositoryCustom 
     @Override
     public Page<NewsFeedPageResponseDto> findLikedFeedsByUserId(Long userId, Pageable pageable) {
         QNewsFeedLikeEntity like = QNewsFeedLikeEntity.newsFeedLikeEntity;
+        QUserEntity user = QUserEntity.userEntity;
         QNewsFeedEntity news = QNewsFeedEntity.newsFeedEntity;
         QCommentEntity comment = QCommentEntity.commentEntity;
+        QNewsFileEntity file = QNewsFileEntity.newsFileEntity;
 
         List<NewsFeedPageResponseDto> content = queryFactory
                 .select(Projections.constructor(
@@ -50,11 +51,14 @@ public class NewsFeedLikeRepositoryImpl implements NewsFeedLikeRepositoryCustom 
                         news.content,
                         news.updatedAt,
                         like.countDistinct(),
-                        comment.countDistinct()
+                        comment.countDistinct(),
+                        file.path.min()
                 ))
                 .from(like)
                 .join(like.newsFeed, news)
+                .join(news.user, user)
                 .leftJoin(comment).on(comment.newsFeed.eq(news))
+                .leftJoin(file).on(file.newsFeed.eq(news))
                 .where(like.user.id.eq(userId))
                 .groupBy(news.id)
                 .orderBy(news.updatedAt.desc())

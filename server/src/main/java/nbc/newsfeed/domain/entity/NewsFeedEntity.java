@@ -23,7 +23,11 @@ import java.util.Optional;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "news_feeds")
+@Table(name = "news_feeds", indexes = {
+		@Index(name = "idx_news_title", columnList = "title"),
+		@Index(name = "idx_news_content", columnList = "content"),
+		@Index(name = "idx_news_updated_at", columnList = "updated_at")
+})
 @Entity
 public class NewsFeedEntity extends TimeBaseEntity{
 	@Id
