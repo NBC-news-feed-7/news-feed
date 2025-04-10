@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import nbc.newsfeed.common.error.CustomException;
+import nbc.newsfeed.common.error.ErrorCode;
 
 
 
@@ -56,5 +58,10 @@ public class CommentEntity extends TimeBaseEntity {
 		this.useYn = 0;
 	}
 
+	public void validateNotAuthor(UserEntity liker) {
+		if (this.user.getId().equals(liker.getId())) {
+			throw new CustomException(ErrorCode.CANNOT_LIKE_OWN_COMMENT);
+		}
+	}
 
 }

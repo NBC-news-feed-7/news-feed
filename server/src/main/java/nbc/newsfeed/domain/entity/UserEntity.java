@@ -25,7 +25,7 @@ import lombok.ToString;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 때문에 무조건 있어야함
 @Table(name = "users")
-@SQLDelete(sql = "UPDATE users SET deleted_at = NOW() WHERE id = ?")
+@SQLDelete(sql = "UPDATE users SET deleted_at = NOW() WHERE id = ?") // soft delete
 @SQLRestriction("deleted_at is NULL") // where 는 depreacted 되었다고한다!
 @Entity
 public class UserEntity extends TimeBaseEntity {
@@ -46,7 +46,7 @@ public class UserEntity extends TimeBaseEntity {
 	private String profileImageUrl;
 
 	@Column(nullable = true)
-	private LocalDateTime deletedAt;
+	private LocalDateTime deletedAt; // deletedAt이 Null이 아니면 삭제 되었다고 판단
 
 	public static UserEntity withRegisterInfo(String email, String password, String nickname) {
 		return UserEntity.builder()
@@ -65,6 +65,8 @@ public class UserEntity extends TimeBaseEntity {
 		this.profileImageUrl = profileImageUrl;
 	}
 
+	// 기본 프로필이미지 Setting
+	// TODO 경로 프로퍼티로 관리 하는게 좋음
 	@PrePersist
 	public void prePersist() {
 		if (this.profileImageUrl == null) {

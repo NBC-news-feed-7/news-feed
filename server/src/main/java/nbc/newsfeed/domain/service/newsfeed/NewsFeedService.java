@@ -13,12 +13,14 @@ import nbc.newsfeed.domain.entity.NewsFileEntity;
 import nbc.newsfeed.domain.entity.UserEntity;
 import nbc.newsfeed.domain.repository.newsfeed.NewsFeedRepository;
 import nbc.newsfeed.domain.repository.newsfile.NewsFileRepository;
+import nbc.newsfeed.domain.repository.friendrequest.FriendRequestRepository;
 import nbc.newsfeed.domain.repository.user.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -29,13 +31,30 @@ public class NewsFeedService {
     private final NewsFeedRepository newsFeedRepository;
     private final UserRepository userRepository;
     private final NewsFileRepository newsFileRepository;
+    private final FriendRequestRepository friendRequestRepository;
 
-    @Transactional(readOnly = true)
+    /**
+     * @deprecated
+     * @param feedsId
+     * @return
+     */
+    @Transactional//(readOnly = true)
     public NewsFeedDto getNewsFeed(Long feedsId) {
 
         NewsFeedEntity newsFeedEntity = newsFeedRepository.findById(feedsId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
+        newsFeedEntity.increaseView(); //추후에 이줄 지워야댐
+        return NewsFeedDto.fromEntity(newsFeedEntity);
+    }
 
+    @Transactional
+    public NewsFeedDto getNewsFeedPessimistic(Long feedsId) {
+
+        NewsFeedEntity newsFeedEntity = newsFeedRepository.findByIdWithPessimisticLock(feedsId);
+        if(newsFeedEntity == null){
+            throw new CustomException(ErrorCode.NEWSFEED_NOT_FOUND);
+        }
+        newsFeedEntity.increaseView();
         return NewsFeedDto.fromEntity(newsFeedEntity);
     }
 
@@ -55,7 +74,9 @@ public class NewsFeedService {
         NewsFeedEntity createNewsFeedEntity = NewsFeedEntity.builder()
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
-                .user(findUser).build();
+                .user(findUser)
+                .viewCount(0L)
+                .build();
         //피드 저장
         NewsFeedEntity savedNewsFeedEntity = newsFeedRepository.save(createNewsFeedEntity);
 
@@ -91,12 +112,19 @@ public class NewsFeedService {
             throw new CustomException(ErrorCode.NEWSFEED_FORBIDDEN);
         }
         findNewsFeed.sofeDelete();
-        //newsFeedRepository.delete(findNewsFeed);
     }
 
     @Transactional(readOnly = true)
-    public Page<NewsFeedPageResponseDto> getFeedsByKeyword(String keyword, NewsFeedSortType sortType, Pageable pageable) {
-        return newsFeedRepository.searchFeeds(keyword, sortType, pageable);
+    public Page<NewsFeedPageResponseDto> getFeedsByKeyword(String keyword, LocalDate startDate, LocalDate endDate, NewsFeedSortType sortType, Pageable pageable) {
+        return newsFeedRepository.searchFeeds(keyword, startDate, endDate, sortType, pageable);
     }
 
+    @Transactional(readOnly = true)
+    public Page<NewsFeedPageResponseDto> getFriendFeeds(Long userId, NewsFeedSortType sortType, Pageable pageable) {
+
+        // 친구 ID 목록 조회
+        List<Long> friendIds = friendRequestRepository.findAllFriendIds(userId);
+
+        return newsFeedRepository.searchFriendFeeds(friendIds, sortType, pageable);
+    }
 }

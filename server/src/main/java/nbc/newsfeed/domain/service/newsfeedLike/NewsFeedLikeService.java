@@ -31,6 +31,8 @@ public class NewsFeedLikeService {
         NewsFeedEntity newsFeed = newsFeedRepository.getByIdOrThrow(newsId);
         UserEntity user = userRepository.getByIdOrThrow(userId);
 
+        newsFeed.validateNotAuthor(user);
+
         newsFeedLikeRepository.validateNotAlreadyLiked(newsFeed, user);
 
         NewsFeedLikeEntity like = NewsFeedLikeEntity.of(newsFeed, user);

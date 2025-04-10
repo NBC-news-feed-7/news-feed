@@ -85,7 +85,7 @@ public class LocalFileImageService implements ImageService {
                         .user(findUser).build();
                 newsFileRepository.save(fileEntity);
             }
-        } catch (IOException | RuntimeException e) {
+        } catch (IOException e) {
             throw new CustomException(ErrorCode.IMAGE_SAVE_FAIL);
         }
         return newsFileRepository.findAllByNewsFeed(findFeed).stream().map(NewsFileEntity::getPath).toList();

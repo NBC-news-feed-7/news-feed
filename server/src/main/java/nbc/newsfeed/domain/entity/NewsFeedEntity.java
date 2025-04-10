@@ -1,13 +1,11 @@
 package nbc.newsfeed.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import nbc.newsfeed.common.error.CustomException;
+import nbc.newsfeed.common.error.ErrorCode;
 import nbc.newsfeed.domain.dto.newsfeed.NewsFeedRequestDto;
+
 import java.time.LocalDateTime;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -19,38 +17,50 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "news_feeds", indexes = {
-		@Index(name = "idx_news_title", columnList = "title"),
-		@Index(name = "idx_news_content", columnList = "content"),
-		@Index(name = "idx_news_updated_at", columnList = "updated_at")
+        @Index(name = "idx_news_title", columnList = "title"),
+        @Index(name = "idx_news_content", columnList = "content"),
+        @Index(name = "idx_news_updated_at", columnList = "updated_at")
 })
 @Entity
-public class NewsFeedEntity extends TimeBaseEntity{
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+public class NewsFeedEntity extends TimeBaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@Column(nullable = false)
-	private String title;
+    @Column(nullable = false)
+    private String title;
 
-	@Column(nullable = false)
-	private String content;
+    @Column(nullable = false)
+    private String content;
+
+    @Column(nullable = false)
+    private Long viewCount;
+    public void increaseView(){
+        this.viewCount++;
+    }
+
+    @Column(nullable = true)
+    private LocalDateTime deletedAt;
 
 
-	@Column(nullable = true)
-	private LocalDateTime deletedAt;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
 
-	@ManyToOne
-	@JoinColumn(name = "user_id", nullable = false)
-	private UserEntity user;
+    public void update(NewsFeedRequestDto requestDto) {
+        this.title = requestDto.getTitle();
+        this.content = requestDto.getContent();
+    }
 
+    public void sofeDelete() {
+        this.deletedAt = LocalDateTime.now();
+    }
 
-	public void update(NewsFeedRequestDto requestDto) {
-		this.title = requestDto.getTitle();
-		this.content = requestDto.getContent();
-	}
+    public void validateNotAuthor(UserEntity liker) {
+        if (this.user.getId().equals(liker.getId())) {
+            throw new CustomException(ErrorCode.CANNOT_LIKE_OWN_POST);
+        }
+    }
 
-	public void sofeDelete(){
-		this.deletedAt = LocalDateTime.now();
-	}
 }
