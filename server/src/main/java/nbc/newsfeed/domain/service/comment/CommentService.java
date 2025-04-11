@@ -114,7 +114,7 @@ public class CommentService {
         if (!comment.getUser().getId().equals(userId)) {
             throw new CustomException(ErrorCode.FORBIDDEN); // 본인이 작성한 댓글만 수정 가능
         }
-        comment.updateContent(updateCommentRequestDTO.getContent());
+        comment.updateContent(updateCommentRequestDTO.getContent()); // test
 
         return PutCommentResponseDTO.builder()
                 .newsFeedId(comment.getNewsFeed().getId())
