@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -32,12 +33,28 @@ public class NewsFeedService {
     private final NewsFileRepository newsFileRepository;
     private final FriendRequestRepository friendRequestRepository;
 
-    @Transactional(readOnly = true)
+    /**
+     * @deprecated
+     * @param feedsId
+     * @return
+     */
+    @Transactional//(readOnly = true)
     public NewsFeedDto getNewsFeed(Long feedsId) {
 
         NewsFeedEntity newsFeedEntity = newsFeedRepository.findById(feedsId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
+        newsFeedEntity.increaseView(); //추후에 이줄 지워야댐
+        return NewsFeedDto.fromEntity(newsFeedEntity);
+    }
 
+    @Transactional
+    public NewsFeedDto getNewsFeedPessimistic(Long feedsId) {
+
+        NewsFeedEntity newsFeedEntity = newsFeedRepository.findByIdWithPessimisticLock(feedsId);
+        if(newsFeedEntity == null){
+            throw new CustomException(ErrorCode.NEWSFEED_NOT_FOUND);
+        }
+        newsFeedEntity.increaseView();
         return NewsFeedDto.fromEntity(newsFeedEntity);
     }
 
@@ -57,7 +74,9 @@ public class NewsFeedService {
         NewsFeedEntity createNewsFeedEntity = NewsFeedEntity.builder()
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
-                .user(findUser).build();
+                .user(findUser)
+                .viewCount(0L)
+                .build();
         //피드 저장
         NewsFeedEntity savedNewsFeedEntity = newsFeedRepository.save(createNewsFeedEntity);
 
@@ -92,12 +111,12 @@ public class NewsFeedService {
         if (!findNewsFeed.getUser().getId().equals(userId)) {
             throw new CustomException(ErrorCode.NEWSFEED_FORBIDDEN);
         }
-        newsFeedRepository.delete(findNewsFeed);
+        findNewsFeed.sofeDelete();
     }
 
     @Transactional(readOnly = true)
-    public Page<NewsFeedPageResponseDto> getFeedsByKeyword(String keyword, NewsFeedSortType sortType, Pageable pageable) {
-        return newsFeedRepository.searchFeeds(keyword, sortType, pageable);
+    public Page<NewsFeedPageResponseDto> getFeedsByKeyword(String keyword, LocalDate startDate, LocalDate endDate, NewsFeedSortType sortType, Pageable pageable) {
+        return newsFeedRepository.searchFeeds(keyword, startDate, endDate, sortType, pageable);
     }
 
     @Transactional(readOnly = true)

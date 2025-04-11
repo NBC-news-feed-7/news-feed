@@ -28,6 +28,8 @@ public class CommentLikeService {
         CommentEntity comment = commentRepository.getByIdOrThrow(commentId);
         UserEntity user = userRepository.getByIdOrThrow(userId);
 
+        comment.validateNotAuthor(user);
+
         commentLikeRepository.validateNotAlreadyLiked(comment, user);
 
         CommentLikeEntity like = CommentLikeEntity.of(comment, user);

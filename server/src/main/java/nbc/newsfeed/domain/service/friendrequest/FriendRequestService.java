@@ -101,8 +101,8 @@ public class FriendRequestService {
      * @return 상태가 업데이트된 친구 요청 정보
      */
     @Transactional
-    public FriendRequestResponseDto acceptRequest(Long requestId) {
-        return updateStatus(requestId, FriendRequestStatus.ACCEPTED);
+    public FriendRequestResponseDto acceptRequest(Long requestId, Long currentUserId) {
+        return updateStatus(requestId, FriendRequestStatus.ACCEPTED, currentUserId);
     }
 
     /**
@@ -112,8 +112,8 @@ public class FriendRequestService {
      * @return 상태가 업데이트된 친구 요청 정보
      */
     @Transactional
-    public FriendRequestResponseDto rejectRequest(Long requestId) {
-        return updateStatus(requestId, FriendRequestStatus.REJECTED);
+    public FriendRequestResponseDto rejectRequest(Long requestId, Long currentUserId) {
+        return updateStatus(requestId, FriendRequestStatus.REJECTED, currentUserId);
     }
 
     /**
@@ -123,9 +123,13 @@ public class FriendRequestService {
      * @param status 새로운 상태
      * @return 변경된 요청 정보
      */
-    private FriendRequestResponseDto updateStatus(Long requestId, FriendRequestStatus status) {
+    private FriendRequestResponseDto updateStatus(Long requestId, FriendRequestStatus status, Long currentUserId) {
         FriendRequestEntity request = friendRequestRepository.findById(requestId)
                 .orElseThrow(() -> new CustomException(ErrorCode.REQUEST_NOT_FOUND));
+
+        if (!request.getToUser().getId().equals(currentUserId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
 
         if (request.getStatus() != FriendRequestStatus.REQUESTED) {
             throw new CustomException(ErrorCode.INVALID_STATUS);
@@ -141,9 +145,15 @@ public class FriendRequestService {
      * @param requestId 친구 요청 ID
      */
     @Transactional
-    public void deleteFriend(Long requestId) {
+    public void deleteFriend(Long requestId, Long currentUserId) {
         FriendRequestEntity request = friendRequestRepository.findById(requestId)
                 .orElseThrow(() -> new CustomException(ErrorCode.REQUEST_NOT_FOUND));
+
+        if (!request.getFromUser().getId().equals(currentUserId) &&
+                !request.getToUser().getId().equals(currentUserId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
         friendRequestRepository.delete(request);
     }
 

@@ -14,7 +14,14 @@ import nbc.newsfeed.domain.dto.friendrequest.FriendRequestStatus;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "friend_requests")
+@Table(
+		name = "friend_requests",
+		indexes = {
+				@Index(name = "idx_to_user_id", columnList = "to_user_id"),
+				@Index(name = "idx_from_to", columnList = "from_user_id, to_user_id"),
+				@Index(name = "idx_status", columnList = "status")
+		}
+)
 @Entity
 public class FriendRequestEntity extends TimeBaseEntity {
 	@Id

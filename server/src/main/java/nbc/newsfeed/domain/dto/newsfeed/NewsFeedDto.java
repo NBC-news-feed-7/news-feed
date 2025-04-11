@@ -18,6 +18,7 @@ public class NewsFeedDto {
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Long viewCount;
 
 
     public static NewsFeedDto fromEntity(NewsFeedEntity entity) {
@@ -29,6 +30,7 @@ public class NewsFeedDto {
                 .content(entity.getContent())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
+                .viewCount(entity.getViewCount())
                 .build();
     }
 

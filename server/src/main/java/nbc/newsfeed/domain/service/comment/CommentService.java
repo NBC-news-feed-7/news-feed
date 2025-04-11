@@ -28,19 +28,23 @@ public class CommentService {
     private final CommentLikeRepository commentLikeRepository;
     private final UserRepository userRepository;
 
+    // 좋아요 개수
     public int getLikeCount(CommentEntity comment) {
         return commentLikeRepository.countByComment(Optional.ofNullable(comment));
     }
 
     public List<CommentResponseDTO> getCommentsByNewsFeedId(Long feedId) {
+        // 피드 찾기 delete_at is not null 인 것만
         NewsFeedEntity newsFeed = newsFeedRepository.findById(feedId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
-        List<CommentEntity> comments = commentRepository.findAllByNewsFeed(newsFeed)
+        // 댓글 찾기 use_yn 1인 댓글만
+        List<CommentEntity> comments = commentRepository.findAllByNewsFeedAndUseYn(newsFeed,1)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
 
         Map<Long, CommentResponseDTO> dtoMap = new HashMap<>();
         List<CommentResponseDTO> rootComments = new ArrayList<>();
 
+        // 댓글 리스트 돌면서 댓글을 맵에 저장
         for (CommentEntity comment : comments) {
             CommentResponseDTO dto = CommentResponseDTO.builder()
                     .id(comment.getId())
@@ -56,16 +60,20 @@ public class CommentService {
             dtoMap.put(dto.getId(), dto);
         }
 
+        // 맵 순회하면서 트리구조 변환
         for (CommentResponseDTO dto : dtoMap.values()) {
+            // 부모 없으면 루트
             if (dto.getParentCommentId() == null) {
                 rootComments.add(dto);
             } else {
+                // 있으면 칠드런
                 CommentResponseDTO parent = dtoMap.get(dto.getParentCommentId());
                 if (parent != null) {
                     parent.getChildren().add(dto);
                 }
             }
         }
+        // 루트만 반환해도 루트 안에 칠드런이 있어서 대댓글 반환 가능
         return rootComments;
     }
 
@@ -77,7 +85,7 @@ public class CommentService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NEWSFEED_NOT_FOUND));
         CommentEntity parentComment = null;
         if (createCommentRequestDTO.getParentCommentId() != null) {
-            parentComment = commentRepository.findById(createCommentRequestDTO.getParentCommentId())
+            parentComment = commentRepository.findByIdAndUseYn(createCommentRequestDTO.getParentCommentId(),1)
                     .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
         }
 
@@ -120,8 +128,9 @@ public class CommentService {
                 .build();
     }
 
+    // 소프트 삭제, 댓글을 삭제하면 하위 댓글에는 영향을 안미침
     public void deleteComment(Long commentId, Long userId) {
-        CommentEntity comment = commentRepository.findById(commentId)
+        CommentEntity comment = commentRepository.findByIdAndUseYn(commentId,1)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
         if (!comment.getUser().getId().equals(userId)) {
             throw new CustomException(ErrorCode.FORBIDDEN);

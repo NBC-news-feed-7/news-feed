@@ -13,6 +13,7 @@ import nbc.newsfeed.domain.service.newsfeedLike.NewsFeedLikeService;
 import nbc.newsfeed.domain.dto.newsfeed.NewsFeedSortType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -38,7 +40,7 @@ public class NewsFeedController {
             @PathVariable Long feedsId,
             Authentication authentication
     ) {
-        NewsFeedDto newsFeedDto = newsFeedService.getNewsFeed(feedsId);
+        NewsFeedDto newsFeedDto = newsFeedService.getNewsFeedPessimistic(feedsId);
         int likeCount = newsFeedLikeService.getLikeCount(feedsId);
         List<CommentResponseDTO> commentResponseDTOList = commentService.getCommentsByNewsFeedId(feedsId);
         List<String> imagePaths = newsFeedService.getNewsFeedImagesPaths(feedsId); //응답엔티티에 넣어줘야함
@@ -83,10 +85,12 @@ public class NewsFeedController {
     @GetMapping
     public ResponseEntity<Page<NewsFeedPageResponseDto>> getFeedsByKeyword(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(defaultValue = "LATEST") NewsFeedSortType sortType,
             Pageable pageable
     ) {
-        Page<NewsFeedPageResponseDto> feeds = newsFeedService.getFeedsByKeyword(keyword, sortType, pageable);
+        Page<NewsFeedPageResponseDto> feeds = newsFeedService.getFeedsByKeyword(keyword, startDate, endDate, sortType, pageable);
         return ResponseEntity.ok(feeds);
     }
 

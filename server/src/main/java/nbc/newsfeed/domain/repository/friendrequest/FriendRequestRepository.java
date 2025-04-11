@@ -1,10 +1,10 @@
 package nbc.newsfeed.domain.repository.friendrequest;
 
 import nbc.newsfeed.domain.entity.FriendRequestEntity;
-import nbc.newsfeed.domain.entity.UserEntity;
 import nbc.newsfeed.domain.dto.friendrequest.FriendRequestStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,15 +20,13 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequestEnti
     boolean existsByFromUserIdAndToUserId(Long fromUserId, Long toUserId);
 
     // 특정 유저에게 온 친구 요청 조회
+    @EntityGraph(attributePaths = {"fromUser", "toUser"})
     List<FriendRequestEntity> findAllByToUserId(Long toUserId);
 
     // 친구 요청 단건 조회 (요청자, 수신자 기준)
     Optional<FriendRequestEntity> findByFromUserIdAndToUserId(Long fromUserId, Long toUserId);
 
-    // 상태에 따른 요청 목록 조회 (예: 요청한 친구 관계만 보기 등)
-    List<FriendRequestEntity> findAllByFromUserAndStatus(UserEntity fromUser, FriendRequestStatus status);
-    List<FriendRequestEntity> findAllByToUserAndStatus(UserEntity toUser, FriendRequestStatus status);
-
+    // 해당 요청 사항 상태 바꾸기
     boolean existsByFromUserIdAndToUserIdAndStatus(Long fromUserId, Long toUserId, FriendRequestStatus friendRequestStatus);
 
     // 상태별 출력

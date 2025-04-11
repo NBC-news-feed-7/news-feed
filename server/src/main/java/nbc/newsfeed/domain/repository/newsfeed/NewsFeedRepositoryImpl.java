@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
 
 
     @Override
-    public Page<NewsFeedPageResponseDto> searchFeeds(String keyword, NewsFeedSortType sortType, Pageable pageable) {
+    public Page<NewsFeedPageResponseDto> searchFeeds(String keyword, LocalDate startDate, LocalDate endDate, NewsFeedSortType sortType, Pageable pageable) {
         QNewsFeedEntity news = QNewsFeedEntity.newsFeedEntity;
         QNewsFeedLikeEntity like = QNewsFeedLikeEntity.newsFeedLikeEntity;
         QCommentEntity comment = QCommentEntity.commentEntity;
@@ -37,6 +39,12 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
             where.and(news.title.containsIgnoreCase(keyword)
                     .or(news.content.containsIgnoreCase(keyword)));
         }
+        if (startDate != null) {
+            where.and(news.createdAt.goe(startDate.atStartOfDay()));
+        }
+        if (endDate != null) {
+            where.and(news.createdAt.loe(endDate.atTime(LocalTime.MAX)));
+        }
 
         List<NewsFeedPageResponseDto> content = queryFactory
                 .select(Projections.constructor(
@@ -49,7 +57,8 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
                         news.updatedAt,
                         like.countDistinct(),
                         comment.countDistinct(),
-                        file.path.min()
+                        file.path.min(),
+                        news.viewCount
                 ))
                 .from(news)
                 .leftJoin(like).on(like.newsFeed.eq(news))
@@ -78,6 +87,7 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
         QNewsFeedEntity news = QNewsFeedEntity.newsFeedEntity;
         QNewsFeedLikeEntity like = new QNewsFeedLikeEntity("like");
         QCommentEntity comment = new QCommentEntity("comment");
+        QNewsFileEntity file = QNewsFileEntity.newsFileEntity;
 
         BooleanBuilder where = new BooleanBuilder();
         where.and(news.user.id.in(friendIds));
@@ -93,12 +103,14 @@ public class NewsFeedRepositoryImpl implements NewsFeedRepositoryCustom {
                         news.content,
                         news.updatedAt,
                         like.countDistinct(),
-                        comment.countDistinct()
+                        comment.countDistinct(),
+                        file.path.min(),
+                        news.viewCount
                 ))
                 .from(news)
                 .leftJoin(like).on(like.newsFeed.eq(news))
                 .leftJoin(comment).on(comment.newsFeed.eq(news))
-                .join(news.user).on(news.user.deletedAt.isNull())
+                .leftJoin(file).on(file.newsFeed.eq(news))
                 .where(where)
                 .groupBy(news.id)
                 .orderBy(sortType.getOrderBy(news, like))
