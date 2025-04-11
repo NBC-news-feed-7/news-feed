@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,6 +42,16 @@ public class ErrorResponseDto {
                 .message("잘못된 입력값입니다")
                 .path(path)
                 .fieldErrors(fieldErrors)
+                .build();
+    }
+    public static ErrorResponseDto from(MaxUploadSizeExceededException ex, String path) {
+        return ErrorResponseDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(ErrorCode.FILE_SIZE_EXCEEDED.getStatus().value()) // 413 Payload Too Large
+                .error(ErrorCode.FILE_SIZE_EXCEEDED.getStatus().name())
+                .message(ErrorCode.FILE_SIZE_EXCEEDED.getMessage())
+                .path(path)
+                .fieldErrors(List.of()) // 필드 에러는 없음
                 .build();
     }
 }

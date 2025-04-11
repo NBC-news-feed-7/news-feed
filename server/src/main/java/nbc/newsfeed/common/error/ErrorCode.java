@@ -26,6 +26,8 @@ public enum ErrorCode {
 	// ✅ 뉴스피드 관련 에러
 	NEWSFEED_NOT_FOUND("존재하지 않는 피드입니다", HttpStatus.NOT_FOUND),
 	NEWSFEED_FORBIDDEN("해당 피드에 대한 권한이 없습니다", HttpStatus.NOT_FOUND),
+	FILE_SIZE_EXCEEDED("파일 용량이 너무 큽니다. 최대 업로드 용량을 확인해주세요.", HttpStatus.PAYLOAD_TOO_LARGE),
+
 
 	// ✅ 댓글 관련 에러
 	COMMENT_NOT_FOUND("존재하지 않는 댓글입니다", HttpStatus.NOT_FOUND),
