@@ -15,10 +15,8 @@ import nbc.newsfeed.domain.repository.commentLike.CommentLikeRepository;
 import nbc.newsfeed.domain.repository.newsfeed.NewsFeedRepository;
 import nbc.newsfeed.domain.repository.user.UserRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -114,7 +112,7 @@ public class CommentService {
         if (!comment.getUser().getId().equals(userId)) {
             throw new CustomException(ErrorCode.FORBIDDEN); // 본인이 작성한 댓글만 수정 가능
         }
-        comment.updateContent(updateCommentRequestDTO.getContent());
+        comment.updateContent(updateCommentRequestDTO.getContent()); // test
 
         return PutCommentResponseDTO.builder()
                 .newsFeedId(comment.getNewsFeed().getId())
