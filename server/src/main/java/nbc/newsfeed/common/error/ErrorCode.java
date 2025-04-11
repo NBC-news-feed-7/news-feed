@@ -16,7 +16,7 @@ public enum ErrorCode {
 	FORBIDDEN("권한 없는 유저입니다.", HttpStatus.FORBIDDEN),
 
 	// ✅ 유저 로직 관련 에러
-	USER_NOT_FOUND("존재하지 않는 사용자입니다", HttpStatus.UNAUTHORIZED),
+	USER_NOT_FOUND("존재하지 않는 사용자입니다", HttpStatus.BAD_REQUEST),
 	PASSWORD_MISMATCH("비밀번호가 일치하지 않습니다", HttpStatus.UNAUTHORIZED),
 	DUPLICATED_EMAIL("이미 등록된 이메일입니다.", HttpStatus.CONFLICT),
 	SAME_PASSWORD("이전 비밀번호와 동일한 비밀번호로 변경할 수 없습니다.", HttpStatus.BAD_REQUEST),
@@ -42,8 +42,11 @@ public enum ErrorCode {
 	ALREADY_LIKED("이미 좋아요를 누르셨습니다.", HttpStatus.CONFLICT),
 	LIKE_NOT_FOUND("좋아요 정보가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
 	NOT_LIKED_YET("좋아요를 누르지 않았습니다.", HttpStatus.NOT_FOUND),
-	CANNOT_LIKE_OWN_POST("자신이 작성한 게시글에는 좋아요를 누를 수 없습니다.",HttpStatus.BAD_REQUEST ),
-	CANNOT_LIKE_OWN_COMMENT("자신이 작성한 댓글에는 좋아요를 누를 수 없습니다.",HttpStatus.BAD_REQUEST);
+	CANNOT_LIKE_OWN_POST("자신이 작성한 게시글에는 좋아요를 누를 수 없습니다.", HttpStatus.BAD_REQUEST),
+	CANNOT_LIKE_OWN_COMMENT("자신이 작성한 댓글에는 좋아요를 누를 수 없습니다.", HttpStatus.BAD_REQUEST),
+
+	// 500 서버
+	INTERNAL_SERVER_ERROR("처리하지 못한 예외가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
 	private final String message;
 	private final HttpStatus status;
