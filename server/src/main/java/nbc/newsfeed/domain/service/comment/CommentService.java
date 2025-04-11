@@ -15,10 +15,8 @@ import nbc.newsfeed.domain.repository.commentLike.CommentLikeRepository;
 import nbc.newsfeed.domain.repository.newsfeed.NewsFeedRepository;
 import nbc.newsfeed.domain.repository.user.UserRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
