@@ -109,7 +109,7 @@ public class CommentService {
     }
 
     public PutCommentResponseDTO updateComment(Long userId, UpdateCommentRequestDTO updateCommentRequestDTO) {
-        CommentEntity comment = commentRepository.findById(updateCommentRequestDTO.getId())
+        CommentEntity comment = commentRepository.findByIdAndUseYn(updateCommentRequestDTO.getId(),1)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
         if (!comment.getUser().getId().equals(userId)) {
             throw new CustomException(ErrorCode.FORBIDDEN); // 본인이 작성한 댓글만 수정 가능
