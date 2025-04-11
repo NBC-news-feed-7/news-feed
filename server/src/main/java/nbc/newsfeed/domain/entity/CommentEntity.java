@@ -17,6 +17,7 @@ import nbc.newsfeed.common.error.ErrorCode;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
 @Table(
 		name = "comments",
 		indexes = {
@@ -26,7 +27,6 @@ import nbc.newsfeed.common.error.ErrorCode;
 		}
 )
 
-@Entity
 public class CommentEntity extends TimeBaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
