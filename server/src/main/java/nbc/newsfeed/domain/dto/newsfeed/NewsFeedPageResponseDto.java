@@ -19,6 +19,7 @@ public class NewsFeedPageResponseDto {
     private Long likeCount;
     private Long commentCount;
     private String thumbnailUrl;
+    private Long viewCount;
 
     private static final String BASE_URL = "http://localhost:8080/";
     private static final String DEFAULT_THUMBNAIL = "https://androidguias.com/wp-content/uploads/2021/10/thumbnail-2-1024x512.jpg.webp";
@@ -27,7 +28,8 @@ public class NewsFeedPageResponseDto {
     public NewsFeedPageResponseDto(Long feedId, Long userId, String nickName,
                                    String title, String content,
                                    LocalDateTime updatedAt,
-                                   Long likeCount, Long commentCount, String thumbnailPath) {
+                                   Long likeCount, Long commentCount,
+                                   String thumbnailPath, Long viewCount) {
         this.feedId = feedId;
         this.userId = userId;
         this.nickName = nickName;
@@ -36,10 +38,10 @@ public class NewsFeedPageResponseDto {
         this.updatedAt = updatedAt;
         this.likeCount = likeCount;
         this.commentCount = commentCount;
-
         this.thumbnailUrl = (thumbnailPath != null)
                 ? BASE_URL + thumbnailPath.replace("\\", "/")
                 : DEFAULT_THUMBNAIL;
+        this.viewCount = viewCount;
     }
 }
 

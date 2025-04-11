@@ -17,6 +17,8 @@ import nbc.newsfeed.common.error.ErrorCode;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+
+
 @Entity
 @Table(
 		name = "comments",
