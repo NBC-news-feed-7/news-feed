@@ -1,12 +1,12 @@
 package nbc.newsfeed.common.error;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @Slf4j
 @RestControllerAdvice
@@ -37,5 +37,13 @@ public class GlobalExceptionHandler {
 		return ResponseEntity
 			.badRequest()
 			.body(ErrorResponseDto.from(ErrorCode.INTERNAL_SERVER_ERROR, request.getRequestURI()));
+	}
+	//3명박 이상 들어올시
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public ResponseEntity<ErrorResponseDto> handleMaxSizeException(MaxUploadSizeExceededException ex,
+																   HttpServletRequest request) {
+		return ResponseEntity
+				.badRequest()
+				.body(ErrorResponseDto.from(ex, request.getRequestURI()));
 	}
 }
