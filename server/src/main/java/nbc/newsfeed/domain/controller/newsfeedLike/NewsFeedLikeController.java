@@ -87,17 +87,17 @@ public class NewsFeedLikeController {
     }
 
     /**
-     * 좋아요 누른 피드 목록 확인
+     * 내 좋아요 누른 피드 목록 확인
      *
-     * @param userId
      * @param pageable
      * @return 200 OK 출력, NewsFeedPageResponseDto
      */
-    @GetMapping("/users/{userId}/likes")
+    @GetMapping("/users/me/likes")
     public ResponseEntity<Page<NewsFeedPageResponseDto>> getLikedFeeds(
-            @PathVariable Long userId,
+            Authentication authentication,
             Pageable pageable
     ) {
+        Long userId = Long.parseLong(authentication.getName());
         Page<NewsFeedPageResponseDto> result = newsFeedLikeService.getLikedFeeds(userId, pageable);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
