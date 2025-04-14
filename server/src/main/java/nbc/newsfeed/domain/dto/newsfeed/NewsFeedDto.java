@@ -22,6 +22,7 @@ public class NewsFeedDto {
 
 
     public static NewsFeedDto fromEntity(NewsFeedEntity entity) {
+        //tes
         return NewsFeedDto.builder()
                 .feedId(entity.getId())
                 .userId(entity.getUser().getId())
